@@ -1,0 +1,30 @@
+item.acid_slime.name=Acid Slime
+item.gem_shard.name=Gem Shard
+item.gems.name=Gems
+item.sand_worms.name=Sand Worms
+item.crab_boots.name=Crab Boots
+item.crab_leggings.name=Crab leggings
+item.crab_chestplate.name=Crab chestplate
+item.crab_cap.name=Crab cap
+
+item.crab_claw_wand.name=Crab Claw Wand
+
+item.black_foozoo_cookie.name=Black Foozoo Cookie
+item.peeled_cactus_fruit.name=Peeled Cactus Fruit
+item.small_plum.name=Small Plum
+item.orange_pineapple.name=Orange pineapple
+item.cheese.name=Cheese
+item.dressed_cheese.name=Dressed Cheese
+item.cactus_sauce.name=Cactus Sauce
+item.raw_t_bone_steak.name=Raw T Bone Steak
+item.small_puffer_fish.name=Small Puffer Fish
+
+tile.sand_worm_can.name=Sand Worm Can
+
+entity.flame_creeper.name=Flame Creeper
+entity.eye.name=Eye
+entity.llama.name=Llama
+entity.ents_krope.name=Ents Krope
+entity.coyote.name=Coyote
+
+itemGroup.tab_sauces=Sauces
