@@ -1,0 +1,4 @@
+/_build/
+/sphinx-enki-info.txt
+*.java.rst
+*.py.rst

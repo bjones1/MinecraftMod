@@ -1,3 +1,11 @@
+// ***************************************************
+// FarmingMod.java -- Define the Minecraft Farming Mod
+// ***************************************************
+// This file defines the core of the Farming Mod, and contains the annotations so that the Minecraft Forge can load and install this into Minecraft.
+//
+//
+// Packge and imports
+// ==================
 package com.bryanandvika.farming;
 
 import java.util.Random;
@@ -52,29 +60,70 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+// Provide convenient access to all the `public static <http://en.wikipedia.org/wiki/Static_import>`_ members in these classes.
+//
+// In particular, I use this to help organize the code: I've placed generic portions of the mod into the ``HelperClass`` below, such as a routine to initialize a new item or block. Specific instances, such as *Black Foozo cookie*, are kept in this file.
 import static com.bryanandvika.farming.HelperClass.*;
 import static java.lang.System.out;
-
+//
+// Core Mod
+// ========
+// .. _modid:
+//
+// All Minecraft Forge mods must have a
+// `Mod <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraftforge/fml/common/Mod.html>`_  `annotation <http://docs.oracle.com/javase/tutorial/java/annotations/>`_. This tells Forge to load this mod and pass it various events (init, etc.). The ``modid`` parameter
+// must a unique name; all resources (texture, etc.) must then be placed in
+// a directory named ``resources/assets/<modid>``.
 @Mod(modid=FarmingMod.MODID, name="Farming mod", version="0.0.1")
 public class FarmingMod {
+    // Since the ``MODID`` is uesd in several places, define it once here.
 	public static final String MODID = "farming";
-	
-    // The instance of your mod that Forge uses.
+
+    // The `instance <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraftforge/fml/common/Mod.Instance.html>`_ of your mod that Forge uses. As I understand it, I can either manually construct this (via ``public static FarmingMod instance = new FarmingMod()``) or request Forge to construct it for me by passing the ``value=MODID`` parameter.
     @Instance(value=MODID)
     public static FarmingMod instance;
-   
-    // Says where the client and server 'proxy' code is loaded.
-    @SidedProxy(clientSide="com.bryanandvika.farming.client.ClientProxy", 
+
+// .. _sided-proxies:
+//
+// Sided proxies
+// -------------
+    // Minecraft uses a client-server architecture: visualization of the player
+    // and the world are handled by the client, while the server takes care of
+    // everything else: storing and updating the state of the world.
+    // To allow the "Open to LAN" option, the client is actually a
+    // client plus a small server; people who host Minecraft run an industrial-
+    // strength server, with no client. Therefore, all Minecraft Forge mods
+    // are split into three pieces:
+    //
+    // - Code that runs both on the client and on the server: everything in
+    //   this file and loaded by this file.
+    // - Code that runs only on the client (the ``ClientProxy``). For example,
+    //   any imports from ``net.minecraft.client`` should only be used in the
+    //   ``ClientProxy``. Otherwise, this code when running on the server will
+    //   crash.
+    // - Code that runs only on the server (the ``ServerProxy``). Since the
+    //   client always includes a server, doing this probably won't cause
+    //   crashes.
+    //
+    // The page at
+    // http://greyminecraftcoder.blogspot.com/2013/11/how-forge-starts-up-your-code.html
+    // provides a nice diagram of this.
+    //
+    // The parameters of `SidedProxy <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraftforge/fml/common/SidedProxy.html>`_
+    // gives the package name of these proxies.
+    @SidedProxy(clientSide="com.bryanandvika.farming.client.ClientProxy",
     		serverSide="com.bryanandvika.farming.CommonProxy")
     public static CommonProxy proxy;
-    
-    // Instances for elements created by this mod.
+
+// Instances for elements created by this mod
+// ------------------------------------------
+// It seems clearer to me to both define and constrct objects in one place whereever possible. The traditional alternative would be to define an object here, then construct it in a preInit or Init method. The core Minecraft code seemt adopt my approach: most of the blocks and items are final, meaning they are construct and initialized at the same time.
 //    public static final ItemInit acidSlimeItem = new ItemInit("acid_slime", CreativeTabs.tabMisc);
     public static final ItemInit gemShardItem = new ItemInit("gem_shard", CreativeTabs.tabMaterials);
 //    public static final ItemInit gemsItem = new ItemInit("gems", CreativeTabs.tabMaterials);
 //    public static final ItemInit sandWormsItem = new ItemInit("sand_worms", CreativeTabs.tabMaterials);
-    //public static final ItemInit 
-    
+    //public static final ItemInit
+
  //   public static final ItemFoodInit blackFoozooCookieItem = new ItemFoodInit("black_foozoo_cookie", CreativeTabs.tabFood,
  //   		3, 0.3f, false);
  //   public static final ItemFoodInit peeledCactusFruitItem = new ItemFoodInit("peeled_cactus_fruit", CreativeTabs.tabFood,
@@ -86,67 +135,68 @@ public class FarmingMod {
  //   public static final ItemFoodInit cheeseItem = new ItemFoodInit("cheese", CreativeTabs.tabFood,
  //   		6, 0.5f, false);
  //   public static final ItemFoodInit dressedCheeseItem = new ItemFoodInit("dressed_cheese", CreativeTabs.tabFood,
- //   		7, 0.6f, false);   
+ //   		7, 0.6f, false);
  //   public static final ItemFoodInit rawTBoneSteakItem = new ItemFoodInit("raw_t_bone_steak", CreativeTabs.tabFood,
  //   		2, .8f, true);
  //   public static final ItemFoodInit smallPufferFishItem = new ItemFoodInit("small_puffer_fish", CreativeTabs.tabFood,
  //   		2, .15f, false);
-    
-    
+
+
     // Copied from http://www.minecraftforge.net/wiki/Custom_Creative_Tabs
 //    public static final CreativeTabsInit tabSauces = new CreativeTabsInit("tab_sauces", smallPlumItem);
-       
+
 //    public static ItemFoodInit cactusSauceItem = new ItemFoodInit("cactus_sauce", tabSauces, 1, 0.3f, false);
-    
+
 //    // See http://bedrockminer.jimdo.com/modding-tutorials/basic-modding/custom-armor/.
 //    public static ArmorMaterial crabArmorMaterial;
 //    public static ItemArmorInit crabCapItem;
 //    public static ItemArmorInit crabChestpateItem;
 //    public static ItemArmorInit crabLeggingsItem;
 //    public static ItemArmorInit crabBootsItem;
-//    
+//
 //    // Copied from http://bedrockminer.jimdo.com/modding-tutorials/basic-modding/custom-tools-swords/
 //    public static ToolMaterial crabToolMaterial;
 //    public static ItemSwordInit crabClawWand;
 //
 //    public static BlockInit sandWormCanBlock;
-    
+
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-//        crabArmorMaterial = EnumHelper.addArmorMaterial("crab_armor", "crab_armor", 
+//        crabArmorMaterial = EnumHelper.addArmorMaterial("crab_armor", "crab_armor",
 //        		5, new int[]{1, 2, 1, 1}, 12);
-//        crabCapItem = new ItemArmorInit("crab_cap", "tutorial", crabArmorMaterial, 
+//        crabCapItem = new ItemArmorInit("crab_cap", "tutorial", crabArmorMaterial,
 //        		0); // Which piece of armor: 0 = helmet, 1 = chestplate, 2 = leggings, 3 = boots
-//        crabChestpateItem = new ItemArmorInit("crab_chestplate", "tutorial", crabArmorMaterial, 
+//        crabChestpateItem = new ItemArmorInit("crab_chestplate", "tutorial", crabArmorMaterial,
 //        		1);
-//        crabLeggingsItem = new ItemArmorInit("crab_leggings", "tutorial", crabArmorMaterial, 
+//        crabLeggingsItem = new ItemArmorInit("crab_leggings", "tutorial", crabArmorMaterial,
 //        		2);
-//        crabBootsItem = new ItemArmorInit("crab_boots", "tutorial", crabArmorMaterial, 
+//        crabBootsItem = new ItemArmorInit("crab_boots", "tutorial", crabArmorMaterial,
 //        		3);
 //
-//        
-//        crabToolMaterial = EnumHelper.addToolMaterial("crabToolMaterial", 
+//
+//        crabToolMaterial = EnumHelper.addToolMaterial("crabToolMaterial",
 //        		0, 48, 2.0f, 1.0f, 5);
 //        crabClawWand = new ItemSwordInit(crabToolMaterial, "crab_claw_wand");
-//        
-//        sandWormCanBlock = new BlockInit("sand_worm_can", 
+//
+//        sandWormCanBlock = new BlockInit("sand_worm_can",
 //        		CreativeTabs.tabDecorations, Material.iron);
-        
+
 //        registerEntity("flame_creeper", instance, EntityFlameCreeper.class);
 //        registerEntity("eye", instance, EntityEye.class);
 //        registerEntity("llama", instance, EntityLlama.class);
 //        registerEntity("ents_krope", instance, EntityEntsKrope.class);
 //        registerEntity("coyote", instance, EntityCoyote.class);
-        
-        proxy.registerRenderers();
+
     }
-    
+
+    // This `EventHandler <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraftforge/fml/common/Mod.EventHandler.html>`_ annotation_ combined with the single `FMLInitializationEvent <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraftforge/fml/common/event/FMLInitializationEvent.html>`_ parameter causes Forge to call this function during Forge mod initialization.
     @EventHandler
     public void load(FMLInitializationEvent event) {
+        proxy.registerItemModelResourceLocation(gemShardItem);
         proxy.registerRenderers();
-        
-        // Recipes
-        // -------
+
+// Recipes
+// -------
         // Acid slime
 
 //        GameRegistry.addShapelessRecipe(new ItemStack(acidSlimeItem), Items.slime_ball,
@@ -154,33 +204,34 @@ public class FarmingMod {
 //        GameRegistry.addSmelting(acidSlimeItem, new ItemStack(
 //                Items.nether_wart), 0.2f);
         MinecraftForge.EVENT_BUS.register(this);
-        
+
         // Black Foozoo Cookie
-//        GameRegistry.addRecipe(new ItemStack(blackFoozooCookieItem), 
+//        GameRegistry.addRecipe(new ItemStack(blackFoozooCookieItem),
 //        		" o ", "ouo", " o ", 'u', Items.cookie, 'o', Items.apple);
-        
+
         // Gem Shard
-        GameRegistry.addRecipe(new ItemStack(Items.diamond), 
+        GameRegistry.addRecipe(new ItemStack(Items.diamond),
         		" xx", "xxx", "xxx", 'x', gemShardItem);
         GameRegistry.addShapelessRecipe(new ItemStack(gemShardItem, 16), Items.emerald);
-        
+
         // Sand Worm Can
-//        GameRegistry.addRecipe(new ItemStack(sandWormCanBlock), "www", "sss", "sss", 
+//        GameRegistry.addRecipe(new ItemStack(sandWormCanBlock), "www", "sss", "sss",
 //        		'w', Items.iron_ingot, 's', FarmingMod.sandWormsItem);
     }
-   
+
+    // This EventHandler_ combined with the `FMLPostInitializationEvent <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraftforge/fml/common/event/FMLPostInitializationEvent.html>`_ as a method parameter causes Forge to call this in the post Mod initialization phase.
     @EventHandler
     public void postInit(FMLPostInitializationEvent event) {
         // Stub Method
     }
-    
+
  //   @SubscribeEvent
  //   public void onEntityDrop(LivingDropsEvent event) {
 //    	if (event.entityLiving instanceof EntityZombie) {
 //    		event.entityLiving.dropItem(FarmingMod.acidSlimeItem, 1);
 //  	  	}
-//    }    
-    
+//    }
+
 //    // Entities
 //    // ========
 //    // Taken from http://www.minecraftforum.net/forums/mapping-and-modding/mapping-and-modding-tutorials/1571558-1-7-2-forge-add-new-block-item-entity-ai-creative.
@@ -189,7 +240,7 @@ public class FarmingMod {
 //    	public EntityFlameCreeper(World world) {
 //    		super(world);
 //    	}
-//    	
+//
 //    	@Override
 //    	protected void applyEntityAttributes()
 //    	{
@@ -200,7 +251,7 @@ public class FarmingMod {
 //	    	this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.45D);
 //	    	this.getEntityAttribute(SharedMonsterAttributes.attackDamage).setBaseValue(2.0D);
 //    	}
-//    	
+//
 //    	// Never gets called -- creepers attack using an explosion, so perhaps this is the
 //    	// wrong way?
 //    	@Override
@@ -213,7 +264,7 @@ public class FarmingMod {
 //    		return canDamage;
 //    	}
 //    }
-//    
+//
 //    @SideOnly(Side.CLIENT)
 //    public static class RenderFlameCreeper extends RenderCreeper
 //    {
@@ -222,7 +273,7 @@ public class FarmingMod {
 //			// TODO Auto-generated constructor stub
 //		}
 //
-//		private static final ResourceLocation Your_Texture = 
+//		private static final ResourceLocation Your_Texture =
 //        	new ResourceLocation(MODID + ":textures/entity/flame_creeper.png");
 //
 //        @Override
@@ -231,28 +282,28 @@ public class FarmingMod {
 //            return Your_Texture;
 //        }
 //    }
-//    
+//
 //    public static class EntityEye extends EntitySlime {
 //    	public EntityEye(World world) {
 //    		super(world);
 //    	}
 //    }
-//    
+//
 //    public static class EntityLlama extends EntitySheep {
 //
 //		public EntityLlama(World world) {
 //			super(world);
 //		}
-//    	
+//
 //    	@Override
 //        protected void applyEntityAttributes()
 //        {
 //            super.applyEntityAttributes();
 //            this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(12.0D);
 //            this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.3D);
-//        }    	
+//        }
 //    }
-//    
+//
 //    @SideOnly(Side.CLIENT)
 //    public static class RenderLlama extends RenderSheep
 //    {
@@ -262,7 +313,7 @@ public class FarmingMod {
 //			// TODO Auto-generated constructor stub
 //		}
 //
-//		private static final ResourceLocation Your_Texture = 
+//		private static final ResourceLocation Your_Texture =
 //        	new ResourceLocation(MODID + ":textures/entity/sheep_skin.png");
 //
 //        @Override
@@ -271,13 +322,13 @@ public class FarmingMod {
 //            return Your_Texture;
 //        }
 //    }
-//    
+//
 //    @SideOnly(Side.CLIENT)
 //    public static class ModelLlama extends ModelQuadruped {
 //        private float field_78152_i;
 //        private static final String __OBFID = "CL_10000852";
 //        private static int height = 12;
-//        
+//
 //        public ModelLlama()
 //        {
 //            super(12 + ModelLlama.height, 0.0F);
@@ -324,7 +375,7 @@ public class FarmingMod {
 //            this.head.rotateAngleX = this.field_78152_i;
 //        }
 //    }
-//    
+//
 //    // Coyote
 //    // ======
 //    // This is the same as a wolf, except for its skin (texture). So, only define a
@@ -338,7 +389,7 @@ public class FarmingMod {
 //			// TODO Auto-generated constructor stub
 //		}
 //
-//		private static final ResourceLocation Your_Texture = 
+//		private static final ResourceLocation Your_Texture =
 //        	new ResourceLocation(MODID + ":textures/entity/sheep_skin.png");
 //
 //        @Override
@@ -347,7 +398,7 @@ public class FarmingMod {
 //            return Your_Texture;
 //        }
 //    }
-//    
+//
 //    public static class EntityCoyote extends EntityWolf {
 //
 //		public EntityCoyote(World p_i1696_1_) {
@@ -355,8 +406,8 @@ public class FarmingMod {
 //			// TODO Auto-generated constructor stub
 //		}
 //    }
-//    
-//    
+//
+//
 //    // Ents Krope
 //    // ==========
 //    // To create a new mob, I must:
@@ -369,7 +420,7 @@ public class FarmingMod {
 //    	public EntityEntsKrope(World world) {
 //    		super(world);
 //    	}
-//    	
+//
 //    	@Override
 //    	protected void applyEntityAttributes()
 //    	{
@@ -381,7 +432,7 @@ public class FarmingMod {
 //	    	this.getEntityAttribute(SharedMonsterAttributes.attackDamage).setBaseValue(0.8D);
 //    	}
 //    }
-//    
+//
 ////    @SideOnly(Side.CLIENT)
 ////    public static class RenderEntsKrope extends RenderLiving
 ////    {
@@ -390,7 +441,7 @@ public class FarmingMod {
 ////			// TODO Auto-generated constructor stub
 ////		}
 ////
-////		private static final ResourceLocation Your_Texture = 
+////		private static final ResourceLocation Your_Texture =
 ////        	new ResourceLocation(MODID + ":textures/entity/sheep_skin.png");
 ////
 ////        @Override
@@ -398,8 +449,8 @@ public class FarmingMod {
 ////        {
 ////            return Your_Texture;
 ////        }
-////    }   
-//    
+////    }
+//
 //    @SideOnly(Side.CLIENT)
 //    public static class ModelEntsKrope extends ModelBase
 //    {
@@ -412,12 +463,12 @@ public class FarmingMod {
 //        ModelRenderer Shape3;
 //        ModelRenderer Shape4;
 //        ModelRenderer Shape5;
-//      
+//
 //      public ModelEntsKrope()
 //      {
 //        textureWidth = 64;
 //        textureHeight = 32;
-//        
+//
 //          Head = new ModelRenderer(this, 0, 0);
 //          Head.addBox(0F, 0F, 0F, 8, 8, 8);
 //          Head.setRotationPoint(0F, 1F, 0F);
@@ -467,7 +518,7 @@ public class FarmingMod {
 //          Shape5.mirror = true;
 //          setRotation(Shape5, 0F, 0F, 0F);
 //      }
-//      
+//
 //      public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5)
 //      {
 //        super.render(entity, f, f1, f2, f3, f4, f5);
@@ -481,14 +532,14 @@ public class FarmingMod {
 //        Shape4.render(f5);
 //        Shape5.render(f5);
 //      }
-//      
+//
 //      private void setRotation(ModelRenderer model, float x, float y, float z)
 //      {
 //        model.rotateAngleX = x;
 //        model.rotateAngleY = y;
 //        model.rotateAngleZ = z;
 //      }
-//      
+//
 ////      public void setRotationAngles(float f, float f1, float f2, float f3, float f4, float f5)
 ////      {
 ////        super.setRotationAngles(f, f1, f2, f3, f4, f5);

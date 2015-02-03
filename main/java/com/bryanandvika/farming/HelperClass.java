@@ -1,7 +1,15 @@
+// ****************
+// HelperClass.java
+// ****************
+// These routines make it easier to create a mod by performing common
+// initilzation functions. Everything is static, so it can be statically
+// imported.
+//
+// Packge and imports
+// ==================
 package com.bryanandvika.farming;
 
 import java.util.Random;
-
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -20,34 +28,128 @@ import net.minecraft.item.ItemSword;
 import net.minecraft.item.Item.ToolMaterial;
 import net.minecraft.item.ItemArmor.ArmorMaterial;
 import net.minecraft.world.World;
+//
+// Concepts
+// ========
+// Some essential concepts upon which the classes in this file depend are:
+//
+// Name
+// ----
+// A ``name`` is used for several purposes: to define an
+// ``unlocalizedName``, which Minecraft uses to look up a locale-
+// specific name and to find a model file (see below for details); and to
+// provide a mod-unique name when when `registering the item <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraftforge/fml/common/registry/GameRegistry.html#registerItem(net.minecraft.item.Item,%20java.lang.String)>`_
+// with Forge.
+//
+// Naming and Internationalization
+// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+// Since Minecraft is sold all over the world, there must be a way to display
+// strings in it in multiple langauges. To do this, Minecraft uses an internal,
+// unlocalized name, then relies on language-specifc files to map this name to
+// its translation various language and regions. Forge uses the same approach.
+// All names for a given language and region are stored in a language file named
+// ``resources/assets/``\ |modid|\ ``/lang/xx_YY.lang``, where xx = `the two-letter
+// name of a language <http://en.wikipedia.org/wiki/ISO_639-1>`_ in lowercase
+// letters and YY = `the two-letter country code
+// <http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2>`_ in capital letters.
+// In this file, a line of the form ``object.unlocalizedName=Name players see``
+// assigs a name, where ``object`` is the specific Minecraft object (e.g.
+// ``item``, ``block``, etc.) and ``unlocalizedName`` is the mod-assigned
+// unlocalized name. For example, given an unlocalized name of color_box for
+// a new item, the line ``item.color_box=Color Box`` in the file ``en_US.lang``
+// and the line ``item.color_box=Colour Box`` in the file en_GB.lang`` would
+// give then item the name "Color Box" in the US and the name "Colour Box" in
+// Great Britian. For examples in this mod, see
+// :download:`../../../../resources/assets/farming/lang/en_US.lang`.
+//
+// .. |modid| replace:: :ref:`modid <modid>`
+//
+// Naming and textures
+// ^^^^^^^^^^^^^^^^^^^
+// An ``unlocalizedName`` also gives the name of a `.json
+// <http://www.json.org/>`_ model file located in
+// ``resources/assets/``\ |modid|\ ``/models/<object_type>`` which must be present
+// for every object in a mod, where ``<object_type>`` is ``item``, ``block``, etc.
+// This file is used to specify the name of the texture to be used when
+// rendering an object, among other things. See
+// :download:`../../../../resources/assets/farming/models/item/gem_shard.json`
+// for more information.
+//
+// TODO: More details on this.
 
+// HelperClass
+// ===========
+// A "hollow" (no non-static members) class to encapsulate all the helpers.
 public class HelperClass {
-    // Helper classes
-    // ==============
+// Helper classes
+// --------------
+// These classes provide a simple way in which to do all the necessary
+// construction of a new item, block, etc.
+//
+    // This class makes it easier to define the essential characteristics of an
+    // item.
     public static class ItemInit extends Item {
-    	ItemInit(String name, CreativeTabs tab) {
+        // Create and define a new `item <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraft/item/Item.html>`_.
+    	ItemInit(
+    	  // The name_ of this item.
+    	  String name,
+    	  // The `creative-mode tab <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraft/creativetab/CreativeTabs.html>`_
+    	  // in which to place this item.
+    	  CreativeTabs tab) {
     		super();
     		initItem(this, name, tab);
     	}
     }
-    
+
+     // A class to simplify adding a food to a mod.
     public static class ItemFoodInit extends ItemFood {
-    	ItemFoodInit(String name, CreativeTabs tab, int food, float saturation, 
-    			boolean isWolfMeat) {
-    		super(food, saturation, isWolfMeat);
+        // Create and define a new `food
+        // <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraft/item/ItemFood.html>`_.
+        // Refer to `hunger mechanics <http://minecraft.gamepedia.com/Hunger#Mechanics>`_
+        // for more information on the meaning of food and saturation below.
+    	ItemFoodInit(
+    	  // The name_ of this food.
+    	  String name,
+    	  // The `creative-mode tab`_ in which to place this food.
+    	  CreativeTabs tab,
+    	  // The amount of food points added when this item is eaten,
+    	  // each each point = 1/2 heart.
+    	  int amount,
+    	  // The food saturation level ration: food saturation increases by
+    	  // food*saturation when this food is eaten.
+    	  float saturation,
+    	  // True if this food is wolf meat.
+    	  boolean isWolfMeat) {
+    		super(amount, saturation, isWolfMeat);
     		initItem(this, name, tab);
-    	}    	
+    	}
+
+    	// See above for parameter meanings.
+    	ItemFoodInit(String name, CreativeTabs tab, int amount,
+    	  boolean isWolfMeat) {
+    		super(amount, isWolfMeat);
+    		initItem(this, name, tab);
+    	}
     }
-    
+
+    // A class to simplify adding a block to a mod.
     public static class BlockInit extends Block {
-    	BlockInit(String name, CreativeTabs tab, Material material) {
-    		super(Material.iron);
+        // Create and define a new `block <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraft/block/Block.html>`_.
+    	BlockInit(
+    	  // The name_ of this block.
+    	  String name,
+    	  // The `creative-mode tab`_ in which to place this block.
+    	  CreativeTabs tab,
+    	  // The material <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraft/block/material/Material.html>`_
+    	  // which componses this block.
+    	  Material material) {
+    		super(material);
     		this.setUnlocalizedName(name);
     		this.setCreativeTab(tab);
     		GameRegistry.registerBlock(this, name);
     	}
     }
-    
+
     // Copied from http://bedrockminer.jimdo.com/modding-tutorials/basic-modding/custom-armor/
     public static class ItemArmorInit extends ItemArmor {
     	public String textureName;
@@ -57,52 +159,52 @@ public class HelperClass {
     		this.textureName = textureName;
     		initItem(this, name, CreativeTabs.tabCombat, 1);
     	}
- 
+
     	@Override
     	public String getArmorTexture(ItemStack stack, Entity entity, int slot, String type)
     	{
     	    return FarmingMod.MODID + ":textures/armor/" + this.textureName + "_" + (this.armorType == 2 ? "2" : "1") + ".png";
     	}
     }
-    
+
     public static class ItemSwordInit extends ItemSword {
     	ItemSwordInit(ToolMaterial toolMaterial, String name) {
     		super(toolMaterial);
     		initItem(this, name, CreativeTabs.tabCombat, 1);
     	}
     }
-    
+
     public static class CreativeTabsInit extends CreativeTabs {
     	Item iconItem;
     	CreativeTabsInit(String name, Item iconItem) {
     		super(name);
     		this.iconItem = iconItem;
     	}
-    	
+
         @Override
         @SideOnly(Side.CLIENT)
         public Item getTabIconItem() {
             return iconItem;
         }
     }
-    
-    public static void registerEntity(String name, Object modInstance, Class entityClass) 
+
+    public static void registerEntity(String name, Object modInstance, Class entityClass)
     {
 	    int entityID = EntityRegistry.findGlobalUniqueEntityId();
 	    long seed = name.hashCode();
 	    Random rand = new Random(seed);
 	    int primaryColor = rand.nextInt() * 16777215;
 	    int secondaryColor = rand.nextInt() * 16777215;
-	
+
 	    EntityRegistry.registerGlobalEntityID(entityClass, name, entityID);
 	    EntityRegistry.registerModEntity(entityClass, name, entityID, modInstance, 64, 1, true);
 	    EntityList.entityEggs.put(Integer.valueOf(entityID), new EntityList.EntityEggInfo(entityID, primaryColor, secondaryColor));
     }
 
 
-    
-    // Helper functions
-    // ================
+
+// Helper functions
+// ================
     // Perform common initialization on a Minecraft Item.
     public static void initItem(Item item, String name, CreativeTabs tab) {
     	initItem(item, name, tab, 64);
@@ -117,6 +219,6 @@ public class HelperClass {
         // Register this item.
         // The second parameter is an unique registry identifier (not the displayed name)
         // Please don't use item1.getUnlocalizedName(), or you will make Lex sad
-        GameRegistry.registerItem(item, name);    	
-    }    
+        GameRegistry.registerItem(item, name);
+    }
 }

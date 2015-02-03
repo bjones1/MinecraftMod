@@ -1,3 +1,9 @@
+// ****************
+// CommonProxy.java
+// ****************
+//
+// Packge and imports
+// ==================
 package com.bryanandvika.farming;
 
 public class CommonProxy {
