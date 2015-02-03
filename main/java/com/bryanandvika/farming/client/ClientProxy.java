@@ -9,9 +9,13 @@
 package com.bryanandvika.farming.client;
 
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelSheep2;
 import net.minecraft.client.model.ModelWolf;
+import net.minecraft.client.renderer.entity.RenderItem;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.entity.passive.EntityWolf;
+import net.minecraft.item.Item;
 import net.minecraftforge.client.MinecraftForgeClient;
 
 import com.bryanandvika.farming.CommonProxy;
@@ -31,7 +35,10 @@ public class ClientProxy extends CommonProxy {
             // This takes two strings; one, I presume, is a path to the resource
             // location. I don't know why the second one is "inventory".
             RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
-            renderItem.getItemModelMesher().register(tutorialItem, 0, new ModelResourceLocation(FarmingMod.MODID + ":" + item.getUnlocalizedName(), "inventory");
+            System.out.println("Loading texture " + item.getUnlocalizedName());
+            renderItem.getItemModelMesher().register(item, 0, 
+            		new ModelResourceLocation(FarmingMod.MODID + ":" + "gem_shard", //item.getUnlocalizedName(), 
+            				"inventory"));
         }
        
         @Override
