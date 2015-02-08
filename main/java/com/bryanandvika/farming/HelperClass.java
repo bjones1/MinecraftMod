@@ -10,12 +10,18 @@
 package com.bryanandvika.farming;
 
 import java.util.Random;
+
+import net.minecraftforge.fml.common.event.FMLStateEvent;
+import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.entity.RenderItem;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
@@ -91,13 +97,17 @@ public class HelperClass {
     public static class ItemInit extends Item {
         // Create and define a new `item <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraft/item/Item.html>`_.
     	ItemInit(
+    	  // .. |event| replace:: The event passed by Forge (FMLPreInitEvent, FMLInitializationEvent)
+    	  //
+    	  // |event|
+    	  FMLStateEvent event, 
     	  // The name_ of this item.
     	  String name,
     	  // The `creative-mode tab <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraft/creativetab/CreativeTabs.html>`_
     	  // in which to place this item.
     	  CreativeTabs tab) {
     		super();
-    		initItem(this, name, tab);
+    		initItem(this, event, name, tab);
     	}
     }
 
@@ -108,6 +118,8 @@ public class HelperClass {
         // Refer to `hunger mechanics <http://minecraft.gamepedia.com/Hunger#Mechanics>`_
         // for more information on the meaning of food and saturation below.
     	ItemFoodInit(
+    	  // |event|
+    	  FMLStateEvent event, 
     	  // The name_ of this food.
     	  String name,
     	  // The `creative-mode tab`_ in which to place this food.
@@ -121,14 +133,14 @@ public class HelperClass {
     	  // True if this food is wolf meat.
     	  boolean isWolfMeat) {
     		super(amount, saturation, isWolfMeat);
-    		initItem(this, name, tab);
+    		initItem(this, event, name, tab);
     	}
 
     	// See above for parameter meanings.
-    	ItemFoodInit(String name, CreativeTabs tab, int amount,
+    	ItemFoodInit(FMLStateEvent event, String name, CreativeTabs tab, int amount,
     	  boolean isWolfMeat) {
     		super(amount, isWolfMeat);
-    		initItem(this, name, tab);
+    		initItem(this, event, name, tab);
     	}
     }
 
@@ -136,6 +148,8 @@ public class HelperClass {
     public static class BlockInit extends Block {
         // Create and define a new `block <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraft/block/Block.html>`_.
     	BlockInit(
+    	  // |event|
+    	  FMLStateEvent event, 
     	  // The name_ of this block.
     	  String name,
     	  // The `creative-mode tab`_ in which to place this block.
@@ -154,10 +168,10 @@ public class HelperClass {
     public static class ItemArmorInit extends ItemArmor {
     	public String textureName;
     	// type: which piece of armor: 0 = helmet, 1 = chestplate, 2 = leggings, 3 = boots;
-    	ItemArmorInit(String name, String textureName, ArmorMaterial armor, int type) {
+    	ItemArmorInit(FMLStateEvent event, String name, String textureName, ArmorMaterial armor, int type) {
     		super(armor, 0 /* Don't know what this does */, type);
     		this.textureName = textureName;
-    		initItem(this, name, CreativeTabs.tabCombat, 1);
+    		initItem(this, event, name, CreativeTabs.tabCombat, 1);
     	}
 
     	@Override
@@ -168,9 +182,9 @@ public class HelperClass {
     }
 
     public static class ItemSwordInit extends ItemSword {
-    	ItemSwordInit(ToolMaterial toolMaterial, String name) {
+    	ItemSwordInit(FMLStateEvent event, ToolMaterial toolMaterial, String name) {
     		super(toolMaterial);
-    		initItem(this, name, CreativeTabs.tabCombat, 1);
+    		initItem(this, event, name, CreativeTabs.tabCombat, 1);
     	}
     }
 
@@ -206,11 +220,11 @@ public class HelperClass {
 // Helper functions
 // ================
     // Perform common initialization on a Minecraft Item.
-    public static void initItem(Item item, String name, CreativeTabs tab) {
-    	initItem(item, name, tab, 64);
+    public static void initItem(Item item, FMLStateEvent event, String name, CreativeTabs tab) {
+    	initItem(item, event, name, tab, 64);
     }
 
-    public static void initItem(Item item, String name, CreativeTabs tab, int maxStackSize) {
+    public static void initItem(Item item, FMLStateEvent event, String name, CreativeTabs tab, int maxStackSize) {
         // The GUI name is therefore in assets.genericmod.lang/en_xx.lang, item.GemShardItem.name=yyy.
         item.setUnlocalizedName(name);
         // The texture is in assets.genericmod.textures.items/gem_shard.png.
@@ -220,5 +234,18 @@ public class HelperClass {
         // The second parameter is an unique registry identifier (not the displayed name)
         // Please don't use item1.getUnlocalizedName(), or you will make Lex sad
         GameRegistry.registerItem(item, name);
+        // Tell only the client where to find the texture for this item.
+        if (event.getSide() == Side.CLIENT) {
+            // Tell Minecraft where to find the texture for a given item. To do
+            // so, use `ItemModelMesher <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraft/client/renderer/ItemModelMesher.html>`_\ .
+            // `register <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraft/client/renderer/ItemModelMesher.html#register(net.minecraft.item.Item,%20int,%20net.minecraft.client.resources.model.ModelResourceLocation)>`_ .
+            // This method expects a `ModelResourceLocation <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraft/client/resources/model/ModelResourceLocation.html>`_.
+            // This takes two strings; one, I presume, is a path to the resource
+            // location. I don't know why the second one is "inventory".
+            RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
+            System.out.println("Loading texture " + name);
+            renderItem.getItemModelMesher().register(item, 0, 
+            		new ModelResourceLocation(FarmingMod.MODID + ":" + name, "inventory"));
+        }
     }
 }

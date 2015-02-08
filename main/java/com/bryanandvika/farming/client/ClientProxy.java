@@ -25,22 +25,7 @@ import com.bryanandvika.farming.FarmingMod;
 // ===========
 // This proxy will be instantiantied only when this mod runs on the client side.
 // See :ref:`sided-proxies` for more information.
-public class ClientProxy extends CommonProxy {
-
-        public void registerItemModelResourceLocation(Item item) {
-            // Tell Minecraft where to find the texture for a given item. To do
-            // so, use `ItemModelMesher <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraft/client/renderer/ItemModelMesher.html>`_\ .
-            // `register <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraft/client/renderer/ItemModelMesher.html#register(net.minecraft.item.Item,%20int,%20net.minecraft.client.resources.model.ModelResourceLocation)>`_ .
-            // This method expects a `ModelResourceLocation <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraft/client/resources/model/ModelResourceLocation.html>`_.
-            // This takes two strings; one, I presume, is a path to the resource
-            // location. I don't know why the second one is "inventory".
-            RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
-            System.out.println("Loading texture " + item.getUnlocalizedName());
-            renderItem.getItemModelMesher().register(item, 0, 
-            		new ModelResourceLocation(FarmingMod.MODID + ":" + "gem_shard", //item.getUnlocalizedName(), 
-            				"inventory"));
-        }
-       
+public class ClientProxy extends CommonProxy {       
         @Override
         public void registerRenderers() {
 // See more at: http://www.wuppy29.com/minecraft/1-8-tutorial/updating-1-7-to-1-8-part-2-basic-items/#sthash.Ln5a20tw.wFn11Yz1.dpuf

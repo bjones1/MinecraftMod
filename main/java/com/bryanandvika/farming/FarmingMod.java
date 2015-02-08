@@ -119,7 +119,7 @@ public class FarmingMod {
 // ------------------------------------------
 // It seems clearer to me to both define and constrct objects in one place whereever possible. The traditional alternative would be to define an object here, then construct it in a preInit or Init method. The core Minecraft code seemt adopt my approach: most of the blocks and items are final, meaning they are construct and initialized at the same time.
 //    public static final ItemInit acidSlimeItem = new ItemInit("acid_slime", CreativeTabs.tabMisc);
-    public static final ItemInit gemShardItem = new ItemInit("gem_shard", CreativeTabs.tabMaterials);
+    public static ItemInit gemShardItem;
 //    public static final ItemInit gemsItem = new ItemInit("gems", CreativeTabs.tabMaterials);
 //    public static final ItemInit sandWormsItem = new ItemInit("sand_worms", CreativeTabs.tabMaterials);
     //public static final ItemInit
@@ -191,8 +191,8 @@ public class FarmingMod {
 
     // This `EventHandler <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraftforge/fml/common/Mod.EventHandler.html>`_ annotation_ combined with the single `FMLInitializationEvent <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraftforge/fml/common/event/FMLInitializationEvent.html>`_ parameter causes Forge to call this function during Forge mod initialization.
     @EventHandler
-    public void load(FMLInitializationEvent event) {
-        proxy.registerItemModelResourceLocation(gemShardItem);
+    public void init(FMLInitializationEvent event) {
+    	gemShardItem = new ItemInit(event, "gem_shard", CreativeTabs.tabMaterials);
         proxy.registerRenderers();
 
 // Recipes
