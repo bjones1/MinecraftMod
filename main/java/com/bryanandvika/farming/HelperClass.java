@@ -155,7 +155,7 @@ public class HelperClass {
     	  // The `creative-mode tab`_ in which to place this block.
     	  CreativeTabs tab,
     	  // The material <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraft/block/material/Material.html>`_
-    	  // which componses this block.
+    	  // which composes this block.
     	  Material material) {
     		super(material);
     		this.setUnlocalizedName(name);

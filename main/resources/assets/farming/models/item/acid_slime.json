@@ -1,7 +1,7 @@
 {
     "parent": "builtin/generated",
     "textures": {
-        "layer0": "deer:items/Venison"
+        "layer0": "farming:items/acid_slime"
     },
     "display": {
         "thirdperson": {
