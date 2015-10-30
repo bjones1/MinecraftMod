@@ -24,6 +24,7 @@ tile.sand_worm_can.name=Sand Worm Can
 entity.flame_creeper.name=Flame Creeper
 entity.eye.name=Eye
 entity.llama.name=Llama
+entity.flame_orb.name=Flame Orb
 entity.ents_krope.name=Ents Krope
 entity.coyote.name=Coyote
 

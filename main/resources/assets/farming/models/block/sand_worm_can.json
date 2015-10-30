@@ -1,0 +1,7 @@
+{
+    "parent": "block/cube_all",
+    "textures": {
+        "normal": "blocks/sand_worm_can"
+        "inventory": "blocks/sand_worm_can"
+    }
+}

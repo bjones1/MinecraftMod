@@ -1,0 +1,10 @@
+{
+    "variants": {
+        "normal": [
+            { "model": "sand_worm_can" },
+            { "model": "sand_worm_can", "y": 90 },
+            { "model": "sand_worm_can", "y": 180 },
+            { "model": "sand_worm_can", "y": 270 }
+        ]
+    }
+}
