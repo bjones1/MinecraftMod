@@ -4,7 +4,7 @@
 // This file defines the core of the Farming Mod, and contains the annotations so that the Minecraft Forge can load and install this into Minecraft.
 //
 //
-// Packge and imports
+// Package and imports
 // ==================
 package com.bryanandvika.farming;
 
@@ -74,12 +74,12 @@ import static java.lang.System.out;
 // .. _modid:
 //
 // All Minecraft Forge mods must have a
-// `Mod <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraftforge/fml/common/Mod.html>`_  `annotation <http://docs.oracle.com/javase/tutorial/java/annotations/>`_. This tells Forge to load this mod and pass it various events (init, etc.). The ``modid`` parameter
+// `Mod <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraftforge/fml/common/Mod.html>`_ `annotation <http://docs.oracle.com/javase/tutorial/java/annotations/>`_. This tells Forge to load this mod and pass it various events (init, etc.). The ``modid`` parameter
 // must a unique name; all resources (texture, etc.) must then be placed in
 // a directory named ``resources/assets/<modid>``.
 @Mod(modid=FarmingMod.MODID, name="Farming mod", version="0.0.1")
 public class FarmingMod {
-    // Since the ``MODID`` is uesd in several places, define it once here.
+    // Since the ``MODID`` is used in several places, define it once here.
 	public static final String MODID = "farming";
 
     // The `instance <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraftforge/fml/common/Mod.Instance.html>`_ of your mod that Forge uses. As I understand it, I can either manually construct this (via ``public static FarmingMod instance = new FarmingMod()``) or request Forge to construct it for me by passing the ``value=MODID`` parameter.
@@ -102,8 +102,7 @@ public class FarmingMod {
     //   this file and loaded by this file.
     // - Code that runs only on the client (the ``ClientProxy``). For example,
     //   any imports from ``net.minecraft.client`` should only be used in the
-    //   ``ClientProxy``. Otherwise, this code when running on the server will
-    //   crash.
+    //   ``ClientProxy``. Otherwise, this code will crash when running on the server.
     // - Code that runs only on the server (the ``ServerProxy``). Since the
     //   client always includes a server, doing this probably won't cause
     //   crashes.
@@ -120,7 +119,8 @@ public class FarmingMod {
 
 // Instances for elements created by this mod
 // ------------------------------------------
-// It seems clearer to me to both define and construct objects in one place wherever possible. The traditional alternative would be to define an object here, then construct it in a preInit or Init method. The core Minecraft code seemt adopt my approach: most of the blocks and items are final, meaning they are construct and initialized at the same time.
+// Define objects here, then construct it in the preInit or Init method. This
+// is the verbosity of Java -- I'll have to repeat this to construct everything.
     public static ItemInit acidSlimeItem; 
     public static ItemInit gemShardItem;
     public static ItemInit gemsItem;
@@ -134,12 +134,10 @@ public class FarmingMod {
     public static ItemFoodInit dressedCheeseItem;
     public static ItemFoodInit rawTBoneSteakItem;
     public static ItemFoodInit smallPufferFishItem;
-
+    public static ItemFoodInit cactusSauceItem;
 
     // Copied from http://www.minecraftforge.net/wiki/Custom_Creative_Tabs
     public static CreativeTabsInit tabSauces;
-
-    public static ItemFoodInit cactusSauceItem;
 
     // See http://bedrockminer.jimdo.com/modding-tutorials/basic-modding/custom-armor/.
     public static ArmorMaterial crabArmorMaterial;
@@ -156,25 +154,6 @@ public class FarmingMod {
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        crabArmorMaterial = EnumHelper.addArmorMaterial("crab_armor", "crab_armor",
-        		5, new int[]{1, 2, 1, 1}, 12);
-//        crabCapItem = new ItemArmorInit(event, "crab_cap", "tutorial", crabArmorMaterial,
-//        		0); // Which piece of armor: 0 = helmet, 1 = chestplate, 2 = leggings, 3 = boots
-//        crabChestpateItem = new ItemArmorInit(event, "crab_chestplate", "tutorial", crabArmorMaterial,
-//        		1);
-//        crabLeggingsItem = new ItemArmorInit(event, "crab_leggings", "tutorial", crabArmorMaterial,
-//        		2);
-//        crabBootsItem = new ItemArmorInit(event, "crab_boots", "tutorial", crabArmorMaterial,
-//        		3);
-
-
-        crabToolMaterial = EnumHelper.addToolMaterial("crabToolMaterial",
-        		0, 48, 2.0f, 1.0f, 5);
-//        crabClawWand = new ItemSwordInit(event, crabToolMaterial, "crab_claw_wand");
-
-        sandWormCanBlock = new BlockInit(event, "sand_worm_can",
-        		CreativeTabs.tabDecorations, Material.iron);
-
         registerEntity("flame_creeper", instance, EntityFlameCreeper.class);
         registerEntity("eye", instance, EntityEye.class);
         registerEntity("llama", instance, EntityLlama.class);
@@ -185,11 +164,11 @@ public class FarmingMod {
 
     }
 
-    // This `EventHandler <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraftforge/fml/common/Mod.EventHandler.html>`_ annotation_ combined with the single `FMLInitializationEvent <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraftforge/fml/common/event/FMLInitializationEvent.html>`_ parameter causes Forge to call this function during Forge mod initialization.
+    // This `EventHandler <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraftforge/fml/common/Mod.EventHandler.html>`_ 
+    // annotation_ combined with the single `FMLInitializationEvent <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraftforge/fml/common/event/FMLInitializationEvent.html>`_ 
+    // parameter causes Forge to call this function during Forge mod initialization.
     @EventHandler
     public void init(FMLInitializationEvent event) {
-//        tabSauces = new CreativeTabsInit("tab_sauces", smallPlumItem);
-        
     	acidSlimeItem = new ItemInit(event, "acid_slime", CreativeTabs.tabMisc);
     	gemShardItem = new ItemInit(event, "gem_shard", CreativeTabs.tabMaterials);
     	gemsItem = new ItemInit(event, "gems", CreativeTabs.tabMisc);  
@@ -213,12 +192,33 @@ public class FarmingMod {
         		2, .15f, false);
         cactusSauceItem = new ItemFoodInit(event, "cactus_sauce", CreativeTabs.tabFood, 1, 0.3f, false);
 
+        crabArmorMaterial = EnumHelper.addArmorMaterial("crab_armor", "crab_armor",
+        		5, new int[]{1, 2, 1, 1}, 12);
+        // This crashes. Leave it out for now.
+        crabCapItem = new ItemArmorInit(event, "crab_cap", "tutorial", crabArmorMaterial,
+        		0); // Which piece of armor: 0 = helmet, 1 = chestplate, 2 = leggings, 3 = boots
+        crabChestpateItem = new ItemArmorInit(event, "crab_chestplate", "tutorial", crabArmorMaterial,
+        		1);
+        crabLeggingsItem = new ItemArmorInit(event, "crab_leggings", "tutorial", crabArmorMaterial,
+        		2);
+        crabBootsItem = new ItemArmorInit(event, "crab_boots", "tutorial", crabArmorMaterial,
+        		3);
+
+        crabToolMaterial = EnumHelper.addToolMaterial("crabToolMaterial",
+        		0, 48, 2.0f, 1.0f, 5);
+        // This crashes. Leave it out for now.
+        crabClawWand = new ItemSwordInit(event, crabToolMaterial, "crab_claw_wand");
+
+        sandWormCanBlock = new BlockInit(event, "sand_worm_can",
+        		CreativeTabs.tabDecorations, Material.iron);
+
         proxy.registerRenderers();
 
-// Recipes
-// -------
+        tabSauces = new CreativeTabsInit("tab_sauces", smallPlumItem);
+      
+		// Recipes
+		// -------
         // Acid slime
-
         GameRegistry.addShapelessRecipe(new ItemStack(acidSlimeItem), Items.slime_ball,
      		   Items.gold_nugget);
         GameRegistry.addSmelting(acidSlimeItem, new ItemStack(Items.nether_wart), 0.2f);
@@ -238,10 +238,12 @@ public class FarmingMod {
         		'w', Items.iron_ingot, 's', FarmingMod.sandWormsItem);
     }
 
-    // This EventHandler_ combined with the `FMLPostInitializationEvent <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraftforge/fml/common/event/FMLPostInitializationEvent.html>`_ as a method parameter causes Forge to call this in the post Mod initialization phase.
+    // This EventHandler_ combined with the `FMLPostInitializationEvent <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraftforge/fml/common/event/FMLPostInitializationEvent.html>`_ 
+    // as a method parameter causes Forge to call this in the post Mod 
+    // initialization phase.
     @EventHandler
     public void postInit(FMLPostInitializationEvent event) {
-        // Stub Method
+        // Nothing to do.
     }
 
     @SubscribeEvent

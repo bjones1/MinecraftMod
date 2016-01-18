@@ -2,11 +2,11 @@
 // HelperClass.java
 // ****************
 // These routines make it easier to create a mod by performing common
-// initilzation functions. Everything is static, so it can be statically
+// initialization functions. Everything is static, so it can be statically
 // imported.
 //
-// Packge and imports
-// ==================
+// Package and imports
+// ===================
 package com.bryanandvika.farming;
 
 import java.util.Random;
@@ -50,8 +50,8 @@ import net.minecraft.world.World;
 // Naming and Internationalization
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 // Since Minecraft is sold all over the world, there must be a way to display
-// strings in it in multiple langauges. To do this, Minecraft uses an internal,
-// unlocalized name, then relies on language-specifc files to map this name to
+// strings in it in multiple languages. To do this, Minecraft uses an internal,
+// unlocalized name, then relies on language-specific files to map this name to
 // its translation various language and regions. Forge uses the same approach.
 // All names for a given language and region are stored in a language file named
 // ``resources/assets/``\ |modid|\ ``/lang/xx_YY.lang``, where xx = `the two-letter
@@ -59,13 +59,13 @@ import net.minecraft.world.World;
 // letters and YY = `the two-letter country code
 // <http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2>`_ in capital letters.
 // In this file, a line of the form ``object.unlocalizedName=Name players see``
-// assigs a name, where ``object`` is the specific Minecraft object (e.g.
+// assigns a name, where ``object`` is the specific Minecraft object (e.g.
 // ``item``, ``block``, etc.) and ``unlocalizedName`` is the mod-assigned
-// unlocalized name. For example, given an unlocalized name of color_box for
+// unlocalized name. For example, given an unlocalized name of ``color_box`` for
 // a new item, the line ``item.color_box=Color Box`` in the file ``en_US.lang``
-// and the line ``item.color_box=Colour Box`` in the file en_GB.lang`` would
+// and the line ``item.color_box=Colour Box`` in the file ``en_GB.lang`` would
 // give then item the name "Color Box" in the US and the name "Colour Box" in
-// Great Britian. For examples in this mod, see
+// Great Britain. For examples in this mod, see
 // :download:`../../../../resources/assets/farming/lang/en_US.lang`.
 //
 // .. |modid| replace:: :ref:`modid <modid>`
@@ -82,7 +82,7 @@ import net.minecraft.world.World;
 // for more information.
 //
 // TODO: More details on this.
-
+//
 // HelperClass
 // ===========
 // A "hollow" (no non-static members) class to encapsulate all the helpers.
@@ -160,7 +160,18 @@ public class HelperClass {
     		super(material);
     		this.setUnlocalizedName(name);
     		this.setCreativeTab(tab);
+    		// Parameterize!
+    		this.setLightLevel(1.0f);
+    		
     		GameRegistry.registerBlock(this, name);
+
+    		// From http://bedrockminer.jimdo.com/modding-tutorials/basic-modding-1-8/first-block/
+    		if (event.getSide() == Side.CLIENT) {
+    			Minecraft.getMinecraft().getRenderItem().getItemModelMesher().
+    			register(Item.getItemFromBlock(this), 0, 
+    					new ModelResourceLocation(FarmingMod.MODID + ":" + name, "inventory"));
+    		}
+
     	}
     }
 
@@ -212,7 +223,8 @@ public class HelperClass {
 
 	    EntityRegistry.registerGlobalEntityID(entityClass, name, entityID);
 	    EntityRegistry.registerModEntity(entityClass, name, entityID, modInstance, 64, 1, true);
-	    EntityList.entityEggs.put(Integer.valueOf(entityID), new EntityList.EntityEggInfo(entityID, primaryColor, secondaryColor));
+	    EntityList.entityEggs.put(Integer.valueOf(entityID), 
+	    		new EntityList.EntityEggInfo(entityID, primaryColor, secondaryColor));
     }
 
 
@@ -243,7 +255,6 @@ public class HelperClass {
             // This takes two strings; one, I presume, is a path to the resource
             // location. I don't know why the second one is "inventory".
             RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
-            System.out.println("Loading texture " + name);
             renderItem.getItemModelMesher().register(item, 0, 
             		new ModelResourceLocation(FarmingMod.MODID + ":" + name, "inventory"));
         }
