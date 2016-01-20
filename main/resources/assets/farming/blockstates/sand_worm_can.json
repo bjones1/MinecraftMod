@@ -1,5 +1,5 @@
 {
     "variants": {
-        "normal": { "model": "farming:sand_worm_cans" }
+        "normal": { "model": "farming:sand_worm_can" }
     }
 }

@@ -280,8 +280,6 @@ public class HelperClass {
     
     // A class to simplify adding a block to a mod.
     public static class BlockBuilder extends GenericBuilder<Block> {
-    	// See name_.
-    	String name;
     	// See tab_.
     	CreativeTabs tab;
     	
@@ -296,6 +294,7 @@ public class HelperClass {
     	  Material material) {
     		super(name);
     		o = new BasicBlock(material);
+    		this.tab = tab;
     	}
     	
     	public void preInit(FMLPreInitializationEvent event) {
