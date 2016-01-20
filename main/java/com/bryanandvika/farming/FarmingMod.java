@@ -121,20 +121,42 @@ public class FarmingMod {
 // ------------------------------------------
 // Define objects here, then construct it in the preInit or Init method. This
 // is the verbosity of Java -- I'll have to repeat this to construct everything.
-    public static ItemInit acidSlimeItem; 
-    public static ItemInit gemShardItem;
-    public static ItemInit gemsItem;
-    public static ItemInit sandWormsItem;
+    public static ItemBuilder acidSlimeItemBuilder = 
+    		new ItemBuilder("acid_slime", CreativeTabs.tabMisc); 
+	public static ItemBuilder gemShardItemBuilder = 
+			new ItemBuilder("gem_shard", CreativeTabs.tabMaterials);
+	public static ItemBuilder gemsItemBuilder = 
+			new ItemBuilder("gems", CreativeTabs.tabMisc);  
+    public static ItemBuilder sandWormsItemBuilder = 
+    		new ItemBuilder("sand_worms", CreativeTabs.tabMaterials);   
+    
+    public static ItemFoodBuilder blackFoozooCookieItemBuilder = 
+    		new ItemFoodBuilder("black_foozoo_cookie", CreativeTabs.tabFood,
+    		3, 0.3f, false);
+    public static ItemFoodBuilder peeledCactusFruitItemBuilder = 
+    		new ItemFoodBuilder("peeled_cactus_fruit", CreativeTabs.tabFood,
+   		    4, 0.3f, false);
+    public static ItemFoodBuilder smallPlumItemBuilder = 
+    		new ItemFoodBuilder("small_plum", CreativeTabs.tabFood,
+    		1, 0.3f, false);
+    public static ItemFoodBuilder orangePineappleItemBuilder = 
+    		new ItemFoodBuilder("orange_pineapple", CreativeTabs.tabFood,
+     		2, 5.0f, false);
+    public static ItemFoodBuilder cheeseItemBuilder = 
+    		new ItemFoodBuilder("cheese", CreativeTabs.tabFood,
+    		6, 0.5f, false);
+    public static ItemFoodBuilder dressedCheeseItemBuilder = 
+    		new ItemFoodBuilder("dressed_cheese", CreativeTabs.tabFood,
+    		7, 0.6f, false);
+    public static ItemFoodBuilder rawTBoneSteakItemBuilder = 
+    		new ItemFoodBuilder("raw_t_bone_steak", CreativeTabs.tabFood,
+    		2, .8f, true);
+    public static ItemFoodBuilder smallPufferFishItemBuilder = 
+    		new ItemFoodBuilder("small_puffer_fish", CreativeTabs.tabFood,
+    		2, .15f, false);
+    public static ItemFoodBuilder cactusSauceItemBuilder = 
+    		new ItemFoodBuilder("cactus_sauce", CreativeTabs.tabFood, 1, 0.3f, false);
 
-    public static ItemFoodInit blackFoozooCookieItem;
-    public static ItemFoodInit peeledCactusFruitItem;
-    public static ItemFoodInit smallPlumItem;
-    public static ItemFoodInit orangePineappleItem;
-    public static ItemFoodInit cheeseItem;
-    public static ItemFoodInit dressedCheeseItem;
-    public static ItemFoodInit rawTBoneSteakItem;
-    public static ItemFoodInit smallPufferFishItem;
-    public static ItemFoodInit cactusSauceItem;
 
     // Copied from http://www.minecraftforge.net/wiki/Custom_Creative_Tabs
     public static CreativeTabsInit tabSauces;
@@ -150,10 +172,16 @@ public class FarmingMod {
     public static ToolMaterial crabToolMaterial;
     public static ItemSwordInit crabClawWand;
 
-    public static BlockInit sandWormCanBlock;
+    public static BlockBuilder sandWormCanBlockBuilder =
+    		new BlockBuilder("sand_worm_can", CreativeTabs.tabDecorations, Material.iron);    
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
+
+    	for (GenericBuilder<Object> gb : genericBuilderList) {
+    		gb.preInit(event);
+    	}
+    	
         registerEntity("flame_creeper", instance, EntityFlameCreeper.class);
         registerEntity("eye", instance, EntityEye.class);
         registerEntity("llama", instance, EntityLlama.class);
@@ -169,32 +197,12 @@ public class FarmingMod {
     // parameter causes Forge to call this function during Forge mod initialization.
     @EventHandler
     public void init(FMLInitializationEvent event) {
-    	acidSlimeItem = new ItemInit(event, "acid_slime", CreativeTabs.tabMisc);
-    	gemShardItem = new ItemInit(event, "gem_shard", CreativeTabs.tabMaterials);
-    	gemsItem = new ItemInit(event, "gems", CreativeTabs.tabMisc);  
-        sandWormsItem = new ItemInit(event, "sand_worms", CreativeTabs.tabMaterials);
+    	for (GenericBuilder<Object> gb : genericBuilderList) {
+    		gb.init(event);
+    	}
         
-        blackFoozooCookieItem = new ItemFoodInit(event, "black_foozoo_cookie", CreativeTabs.tabFood,
-        		3, 0.3f, false);
-        peeledCactusFruitItem = new ItemFoodInit(event, "peeled_cactus_fruit", CreativeTabs.tabFood,
-       		    4, 0.3f, false);
-        smallPlumItem = new ItemFoodInit(event, "small_plum", CreativeTabs.tabFood,
-        		1, 0.3f, false);
-        orangePineappleItem = new ItemFoodInit(event, "orange_pineapple", CreativeTabs.tabFood,
-         		2, 5.0f, false);
-        cheeseItem = new ItemFoodInit(event, "cheese", CreativeTabs.tabFood,
-        		6, 0.5f, false);
-        dressedCheeseItem = new ItemFoodInit(event, "dressed_cheese", CreativeTabs.tabFood,
-        		7, 0.6f, false);
-        rawTBoneSteakItem = new ItemFoodInit(event, "raw_t_bone_steak", CreativeTabs.tabFood,
-        		2, .8f, true);
-        smallPufferFishItem = new ItemFoodInit(event, "small_puffer_fish", CreativeTabs.tabFood,
-        		2, .15f, false);
-        cactusSauceItem = new ItemFoodInit(event, "cactus_sauce", CreativeTabs.tabFood, 1, 0.3f, false);
-
         crabArmorMaterial = EnumHelper.addArmorMaterial("crab_armor", "crab_armor",
         		5, new int[]{1, 2, 1, 1}, 12);
-        // This crashes. Leave it out for now.
         crabCapItem = new ItemArmorInit(event, "crab_cap", "tutorial", crabArmorMaterial,
         		0); // Which piece of armor: 0 = helmet, 1 = chestplate, 2 = leggings, 3 = boots
         crabChestpateItem = new ItemArmorInit(event, "crab_chestplate", "tutorial", crabArmorMaterial,
@@ -206,36 +214,32 @@ public class FarmingMod {
 
         crabToolMaterial = EnumHelper.addToolMaterial("crabToolMaterial",
         		0, 48, 2.0f, 1.0f, 5);
-        // This crashes. Leave it out for now.
         crabClawWand = new ItemSwordInit(event, crabToolMaterial, "crab_claw_wand");
-
-        sandWormCanBlock = new BlockInit(event, "sand_worm_can",
-        		CreativeTabs.tabDecorations, Material.iron);
 
         proxy.registerRenderers();
 
-        tabSauces = new CreativeTabsInit("tab_sauces", smallPlumItem);
+        tabSauces = new CreativeTabsInit("tab_sauces", smallPlumItemBuilder.o);
       
 		// Recipes
 		// -------
         // Acid slime
-        GameRegistry.addShapelessRecipe(new ItemStack(acidSlimeItem), Items.slime_ball,
+        GameRegistry.addShapelessRecipe(new ItemStack(acidSlimeItemBuilder.o), Items.slime_ball,
      		   Items.gold_nugget);
-        GameRegistry.addSmelting(acidSlimeItem, new ItemStack(Items.nether_wart), 0.2f);
+        GameRegistry.addSmelting(acidSlimeItemBuilder.o, new ItemStack(Items.nether_wart), 0.2f);
         MinecraftForge.EVENT_BUS.register(this);
 
         // Black Foozoo Cookie
-        GameRegistry.addRecipe(new ItemStack(blackFoozooCookieItem),
+        GameRegistry.addRecipe(new ItemStack(blackFoozooCookieItemBuilder.o),
         		" o ", "ouo", " o ", 'u', Items.cookie, 'o', Items.apple);
 
         // Gem Shard
         GameRegistry.addRecipe(new ItemStack(Items.diamond),
-        		" xx", "xxx", "xxx", 'x', gemShardItem);
-        GameRegistry.addShapelessRecipe(new ItemStack(gemShardItem, 16), Items.emerald);
+        		" xx", "xxx", "xxx", 'x', gemShardItemBuilder.o);
+        GameRegistry.addShapelessRecipe(new ItemStack(gemShardItemBuilder.o, 16), Items.emerald);
 
         // Sand Worm Can
-        GameRegistry.addRecipe(new ItemStack(sandWormCanBlock), "www", "sss", "sss",
-        		'w', Items.iron_ingot, 's', FarmingMod.sandWormsItem);
+        GameRegistry.addRecipe(new ItemStack(sandWormCanBlockBuilder.o), "www", "sss", "sss",
+        		'w', Items.iron_ingot, 's', FarmingMod.sandWormsItemBuilder.o);
     }
 
     // This EventHandler_ combined with the `FMLPostInitializationEvent <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraftforge/fml/common/event/FMLPostInitializationEvent.html>`_ 
@@ -243,13 +247,15 @@ public class FarmingMod {
     // initialization phase.
     @EventHandler
     public void postInit(FMLPostInitializationEvent event) {
-        // Nothing to do.
+    	for (GenericBuilder<Object> gb : genericBuilderList) {
+    		gb.postInit(event);
+    	}
     }
 
     @SubscribeEvent
     public void onEntityDrop(LivingDropsEvent event) {
     	if (event.entityLiving instanceof EntityZombie) {
-    		event.entityLiving.dropItem(FarmingMod.acidSlimeItem, 1);
+    		event.entityLiving.dropItem(FarmingMod.acidSlimeItemBuilder.o, 1);
   	  	}
     }
 
