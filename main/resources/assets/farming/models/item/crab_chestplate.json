@@ -1,0 +1,6 @@
+{
+    "parent":"farming:item/standard_item",
+	"textures": {
+		"layer0":"farming:items/crab_chestplate"	
+	}
+}

@@ -98,30 +98,6 @@ public class MinecraftObjectBuilder {
 // Old code
 // ========
 // This should all be converted into builders.
-    // Copied from http://bedrockminer.jimdo.com/modding-tutorials/basic-modding/custom-armor/
-    public static class ItemArmorInit extends ItemArmor {
-        public String textureName;
-        // type: which piece of armor: 0 = helmet, 1 = chestplate, 2 = leggings, 3 = boots;
-        ItemArmorInit(FMLStateEvent event, String name, String textureName, ArmorMaterial armor, int type) {
-            super(armor, 0 /* Don't know what this does */, type);
-            this.textureName = textureName;
-//            initItem(this, event, name, CreativeTabs.tabCombat, 1);
-        }
-
-        @Override
-        public String getArmorTexture(ItemStack stack, Entity entity, int slot, String type)
-        {
-            return FarmingMod.MODID + ":textures/armor/" + this.textureName + "_" + (this.armorType == 2 ? "2" : "1") + ".png";
-        }
-    }
-
-    public static class ItemSwordInit extends ItemSword {
-        ItemSwordInit(FMLStateEvent event, ToolMaterial toolMaterial, String name) {
-            super(toolMaterial);
-//            initItem(this, event, name, CreativeTabs.tabCombat, 1);
-        }
-    }
-
     public static class CreativeTabsInit extends CreativeTabs {
         Item iconItem;
         CreativeTabsInit(String name, Item iconItem) {
@@ -161,6 +137,37 @@ public class MinecraftObjectBuilder {
         }
     }
 
+    // Create a simple class to aid in loading the correct armor texture in.
+    // Copied from http://bedrockminer.jimdo.com/modding-tutorials/basic-modding/custom-armor/
+    public class BasicItemArmor extends ItemArmor {
+    	// .. _textureName:
+    	//
+    	// Define the base name of the texture file for this armor: see ``getArmorTexture``. 
+        public String textureName;
+        
+        public BasicItemArmor(
+          // See textureName_.
+          String textureName,
+          // .. _armorMaterial:
+          //
+          // The armor material for this armor.
+          ArmorMaterial armor,
+          // .. _armorType:
+          //
+          // Which piece of armor: 0 = helmet, 1 = chestplate, 2 = leggings, 3 = boots.
+          int armorType) {
+        	
+            super(armor, 0 /* Don't know what this does */, armorType);
+            this.textureName = textureName;
+        }
+
+        @Override
+        public String getArmorTexture(ItemStack stack, Entity entity, int slot, String type)
+        {
+            return modid + ":textures/armor/" + this.textureName + "_" + (this.armorType == 2 ? "2" : "1") + ".png";
+        }
+    }
+
 
 // Helper functions
 // ================
@@ -178,7 +185,7 @@ public class MinecraftObjectBuilder {
         GameRegistry.registerItem(item, name);
     }
     
-    public static void initItem(Item item, String name, FMLInitializationEvent event) {
+    public void initItem(Item item, String name, FMLInitializationEvent event) {
         // Tell only the client where to find the texture for this item.
         if (event.getSide() == Side.CLIENT) {
             // Tell Minecraft where to find the texture for a given item. To do
@@ -189,13 +196,25 @@ public class MinecraftObjectBuilder {
             // location. I don't know why the second one is "inventory".
             RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
             renderItem.getItemModelMesher().register(item, 0, 
-                    new ModelResourceLocation(FarmingMod.MODID + ":" + name, "inventory"));
+                    new ModelResourceLocation(modid + ":" + name, "inventory"));
         }
     }
     
     
 // Builder framework
 // =================
+    // .. _modid:
+    //
+    // The mod id of the mod using this framework.
+    String modid;
+    
+    public MinecraftObjectBuilder(
+      // The mod id of the mod using this framework.
+	  String modid) {
+    	
+    	this.modid = modid;
+    }
+    
     // A list of builders, on which preInit, Init, and postInit will be invoked.
     protected LinkedList<GenericBuilder> genericBuilderList = 
             new LinkedList<GenericBuilder>();
@@ -344,6 +363,43 @@ public class MinecraftObjectBuilder {
         }
     }
 
+    
+    // Build armor.
+    public class ItemArmorBuilder extends TemplateItemBuilder<ItemArmor> {
+        
+    	public ItemArmorBuilder(
+          // See name_.
+          String name,
+          // See tab_.
+          CreativeTabs tab,
+          // See textureName_.
+          String textureName,
+          // See textureName_.
+          ArmorMaterial armor,
+          // See armorType_.
+          int armorType) {
+          
+    		super(name, tab);
+    		i = new BasicItemArmor(textureName, armor, armorType);
+    	}
+    }
+
+    
+    public class ItemSwordBuilder extends TemplateItemBuilder<ItemSword> {
+    	
+    	public ItemSwordBuilder(
+          // See name_.
+          String name,
+          // See tab_.
+          CreativeTabs tab,
+          // Material composing the sword.
+          ToolMaterial toolMaterial) {
+    		
+    		super(name, tab);
+    		i = new ItemSword(toolMaterial);
+        }
+    }
+    
     
     // A class to simplify adding a block to a mod.
     public class BlockBuilder extends InventoryBuilder<Block> {

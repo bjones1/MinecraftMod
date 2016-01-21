@@ -119,7 +119,7 @@ public class FarmingMod {
 
 // Instances for elements created by this mod
 // ------------------------------------------
-    protected static MinecraftObjectBuilder builder = new MinecraftObjectBuilder();
+    protected static MinecraftObjectBuilder builder = new MinecraftObjectBuilder(MODID);
     public static ItemBuilder acidSlimeItemBuilder = 
     		builder.new ItemBuilder("acid_slime", CreativeTabs.tabMisc); 
 	public static ItemBuilder gemShardItemBuilder = 
@@ -161,16 +161,34 @@ public class FarmingMod {
     public static CreativeTabsInit tabSauces;
 
     // See http://bedrockminer.jimdo.com/modding-tutorials/basic-modding/custom-armor/.
-    public static ArmorMaterial crabArmorMaterial;
-    public static ItemArmorInit crabCapItem;
-    public static ItemArmorInit crabChestpateItem;
-    public static ItemArmorInit crabLeggingsItem;
-    public static ItemArmorInit crabBootsItem;
+    public static ArmorMaterial crabArmorMaterial = 
+    		EnumHelper.addArmorMaterial("crab_armor", "crab_armor",
+    		5, new int[]{1, 2, 1, 1}, 12);
+    public static ItemArmorBuilder crabCapItemBuilder = 
+    		builder.new ItemArmorBuilder("crab_helmet", CreativeTabs.tabCombat, 
+    				"tutorial", crabArmorMaterial, 0);
+    public static ItemArmorBuilder crabChestpateItemBuilder = 
+    		builder.new ItemArmorBuilder("crab_chestplate", 
+    				CreativeTabs.tabCombat, "tutorial", crabArmorMaterial,
+    				1);
+    public static ItemArmorBuilder crabLeggingsItemBuilder = 
+    		builder.new ItemArmorBuilder("crab_leggings", 
+    				CreativeTabs.tabCombat, "tutorial", crabArmorMaterial,
+    				2);
+    public static ItemArmorBuilder crabBootsItemBuilder = 
+    		builder.new ItemArmorBuilder("crab_boots", 
+    				CreativeTabs.tabCombat, "tutorial", crabArmorMaterial,
+    				3);
 
     // Copied from http://bedrockminer.jimdo.com/modding-tutorials/basic-modding/custom-tools-swords/
-    public static ToolMaterial crabToolMaterial;
-    public static ItemSwordInit crabClawWand;
+    public static ToolMaterial crabToolMaterial = 
+    		EnumHelper.addToolMaterial("crabToolMaterial", 0, 48, 2.0f, 1.0f, 5);
+    public static ItemSwordBuilder crabClawWandBuilder =
+    		builder.new ItemSwordBuilder("crab_claw_wand", 
+    				CreativeTabs.tabCombat, crabToolMaterial);
 
+
+    
     public static BlockBuilder sandWormCanBlockBuilder =
     		builder.new BlockBuilder("sand_worm_can", CreativeTabs.tabDecorations, Material.iron);    
 
@@ -196,20 +214,6 @@ public class FarmingMod {
     public void init(FMLInitializationEvent event) {
     	builder.init(event);
         
-        crabArmorMaterial = EnumHelper.addArmorMaterial("crab_armor", "crab_armor",
-        		5, new int[]{1, 2, 1, 1}, 12);
-        crabCapItem = new ItemArmorInit(event, "crab_cap", "tutorial", crabArmorMaterial,
-        		0); // Which piece of armor: 0 = helmet, 1 = chestplate, 2 = leggings, 3 = boots
-        crabChestpateItem = new ItemArmorInit(event, "crab_chestplate", "tutorial", crabArmorMaterial,
-        		1);
-        crabLeggingsItem = new ItemArmorInit(event, "crab_leggings", "tutorial", crabArmorMaterial,
-        		2);
-        crabBootsItem = new ItemArmorInit(event, "crab_boots", "tutorial", crabArmorMaterial,
-        		3);
-
-        crabToolMaterial = EnumHelper.addToolMaterial("crabToolMaterial",
-        		0, 48, 2.0f, 1.0f, 5);
-        crabClawWand = new ItemSwordInit(event, crabToolMaterial, "crab_claw_wand");
 
         proxy.registerRenderers();
 

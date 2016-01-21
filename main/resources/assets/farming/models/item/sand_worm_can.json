@@ -1,5 +1,5 @@
 {
-    "parent" : "farming:block/sand_worm_can",
+    "parent":"farming:block/sand_worm_can",
     "display": {
         "thirdperson": {
             "rotation": [ 10, -45, 170 ],
