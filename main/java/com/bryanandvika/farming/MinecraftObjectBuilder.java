@@ -11,7 +11,7 @@ package com.bryanandvika.farming;
 
 import java.util.Random;
 
-import com.bryanandvika.farming.BuilderClass.GenericBuilder;
+import com.bryanandvika.farming.MinecraftObjectBuilder.GenericBuilder;
 
 import java.util.LinkedList;
 
@@ -94,45 +94,40 @@ import net.minecraft.world.World;
 // ===========
 // Provides a set of classes coupled with a means to construct them at the 
 // appropriate times (at construction, or during preInit, init, or postInit).
-public class BuilderClass {
-	
-	// The Minecraft Block class has a protected constructor. Make it public.
-	public static class BasicBlock extends Block {
-		public BasicBlock(Material material) {
-			super(material);
-		}
-	}
-
+public class MinecraftObjectBuilder {
+// Old code
+// ========
+// This should all be converted into builders.
     // Copied from http://bedrockminer.jimdo.com/modding-tutorials/basic-modding/custom-armor/
     public static class ItemArmorInit extends ItemArmor {
-    	public String textureName;
-    	// type: which piece of armor: 0 = helmet, 1 = chestplate, 2 = leggings, 3 = boots;
-    	ItemArmorInit(FMLStateEvent event, String name, String textureName, ArmorMaterial armor, int type) {
-    		super(armor, 0 /* Don't know what this does */, type);
-    		this.textureName = textureName;
-//    		initItem(this, event, name, CreativeTabs.tabCombat, 1);
-    	}
+        public String textureName;
+        // type: which piece of armor: 0 = helmet, 1 = chestplate, 2 = leggings, 3 = boots;
+        ItemArmorInit(FMLStateEvent event, String name, String textureName, ArmorMaterial armor, int type) {
+            super(armor, 0 /* Don't know what this does */, type);
+            this.textureName = textureName;
+//            initItem(this, event, name, CreativeTabs.tabCombat, 1);
+        }
 
-    	@Override
-    	public String getArmorTexture(ItemStack stack, Entity entity, int slot, String type)
-    	{
-    	    return FarmingMod.MODID + ":textures/armor/" + this.textureName + "_" + (this.armorType == 2 ? "2" : "1") + ".png";
-    	}
+        @Override
+        public String getArmorTexture(ItemStack stack, Entity entity, int slot, String type)
+        {
+            return FarmingMod.MODID + ":textures/armor/" + this.textureName + "_" + (this.armorType == 2 ? "2" : "1") + ".png";
+        }
     }
 
     public static class ItemSwordInit extends ItemSword {
-    	ItemSwordInit(FMLStateEvent event, ToolMaterial toolMaterial, String name) {
-    		super(toolMaterial);
-//    		initItem(this, event, name, CreativeTabs.tabCombat, 1);
-    	}
+        ItemSwordInit(FMLStateEvent event, ToolMaterial toolMaterial, String name) {
+            super(toolMaterial);
+//            initItem(this, event, name, CreativeTabs.tabCombat, 1);
+        }
     }
 
     public static class CreativeTabsInit extends CreativeTabs {
-    	Item iconItem;
-    	CreativeTabsInit(String name, Item iconItem) {
-    		super(name);
-    		this.iconItem = iconItem;
-    	}
+        Item iconItem;
+        CreativeTabsInit(String name, Item iconItem) {
+            super(name);
+            this.iconItem = iconItem;
+        }
 
         @Override
         @SideOnly(Side.CLIENT)
@@ -143,23 +138,35 @@ public class BuilderClass {
 
     public static void registerEntity(String name, Object modInstance, Class entityClass)
     {
-	    int entityID = EntityRegistry.findGlobalUniqueEntityId();
-	    long seed = name.hashCode();
-	    Random rand = new Random(seed);
-	    int primaryColor = rand.nextInt() * 16777215;
-	    int secondaryColor = rand.nextInt() * 16777215;
+        int entityID = EntityRegistry.findGlobalUniqueEntityId();
+        long seed = name.hashCode();
+        Random rand = new Random(seed);
+        int primaryColor = rand.nextInt() * 16777215;
+        int secondaryColor = rand.nextInt() * 16777215;
 
-	    EntityRegistry.registerGlobalEntityID(entityClass, name, entityID);
-	    EntityRegistry.registerModEntity(entityClass, name, entityID, modInstance, 64, 1, true);
-	    EntityList.entityEggs.put(Integer.valueOf(entityID), 
-	    		new EntityList.EntityEggInfo(entityID, primaryColor, secondaryColor));
+        EntityRegistry.registerGlobalEntityID(entityClass, name, entityID);
+        EntityRegistry.registerModEntity(entityClass, name, entityID, modInstance, 64, 1, true);
+        EntityList.entityEggs.put(Integer.valueOf(entityID), 
+                new EntityList.EntityEggInfo(entityID, primaryColor, secondaryColor));
     }
 
+// Helper classes
+// ==============
+// Builders use these classes in the build process. They aren't intended for 
+// direct use by mod authors.
+    // The Minecraft Block class has a protected constructor. Make it public.
+    public static class BasicBlock extends Block {
+        public BasicBlock(Material material) {
+            super(material);
+        }
+    }
 
 
 // Helper functions
 // ================
-    // Perform common initialization on a Minecraft Item.
+// Item initialization
+// -------------------
+// These functions perform common initialization on a Minecraft Item.
     public static void preInitItem(Item item, String name, CreativeTabs tab) {
         // The GUI name is therefore in assets.genericmod.lang/en_xx.lang, item.GemShardItem.name=yyy.
         item.setUnlocalizedName(name);
@@ -182,153 +189,188 @@ public class BuilderClass {
             // location. I don't know why the second one is "inventory".
             RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
             renderItem.getItemModelMesher().register(item, 0, 
-            		new ModelResourceLocation(FarmingMod.MODID + ":" + name, "inventory"));
+                    new ModelResourceLocation(FarmingMod.MODID + ":" + name, "inventory"));
         }
     }
     
+    
+// Builder framework
+// =================
+    // A list of builders, on which preInit, Init, and postInit will be invoked.
+    protected LinkedList<GenericBuilder> genericBuilderList = 
+            new LinkedList<GenericBuilder>();
+    
+    // Methods to invoke preInit, init, and postInit on all objects in genericBuilderList.
+    public void preInit(FMLPreInitializationEvent event) {
+        for (GenericBuilder gb : genericBuilderList) {
+            gb.preInit(event);
+        }
+    }
+    
+    public void init(FMLInitializationEvent event) {
+        for (GenericBuilder gb : genericBuilderList) {
+            gb.init(event);
+        }
+    }
+    
+    public void postInit(FMLPostInitializationEvent event) {
+        for (GenericBuilder gb : genericBuilderList) {
+            gb.postInit(event);
+        }
+    }
+    
+    
 // Builders
 // ========
-    // A list of builders, on which preInit, Init, and postInit will be invoked.
-    protected LinkedList<GenericBuilder<Object>> genericBuilderList = 
-    		new LinkedList<GenericBuilder<Object>>();
-    
-    public void preInit(FMLPreInitializationEvent event) {
-    	for (GenericBuilder<Object> gb : genericBuilderList) {
-    		gb.preInit(event);
-    	}
-    }
-    
-	public void init(FMLInitializationEvent event) {
-    	for (GenericBuilder<Object> gb : genericBuilderList) {
-    		gb.init(event);
-    	}
-	}
-	
-	public void postInit(FMLPostInitializationEvent event) {
-    	for (GenericBuilder<Object> gb : genericBuilderList) {
-    		gb.postInit(event);
-    	}
-	}
-	
+// Internal classes
+// ----------------
+// These classes are used to build a nice, object-oriented hierarchy of builders.
+// However, they should't directly be used to construct objects in a mod.
     // The generic builder only holds a name and defines empty preInit, init, and postInit methods.
-    protected class GenericBuilder<O> {
-    	// The object which this class builds.
-    	O o;
+    protected class GenericBuilder {
     	// .. _name::
     	//
-   	    // The name of this item.
+    	// The name of this item.
     	String name;
-    	
-    	GenericBuilder(
-    	  // See name_.
+        
+        protected GenericBuilder(
+          // See name_.
           String name) {
-    		
-    		this.name = name;
-    		genericBuilderList.add((GenericBuilder<Object>) this);
-    	}
-    	
-    	public void preInit(FMLPreInitializationEvent event) {
-    	}
-    	
-    	public void init(FMLInitializationEvent event) {
-    	}
-    	
-    	public void postInit(FMLPostInitializationEvent event) {
-    	}
+            
+            this.name = name;
+            genericBuilderList.add(this);
+        }
+        
+        public void preInit(FMLPreInitializationEvent event) {
+        }
+        
+        public void init(FMLInitializationEvent event) {
+        }
+        
+        public void postInit(FMLPostInitializationEvent event) {
+        }
     }
     
     
-    // Build an item.
-    public class ItemBuilder extends GenericBuilder<Item> {
-    	// .. _tab:
-    	//
-		// The `creative-mode tab <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraft/creativetab/CreativeTabs.html>`_
-	  	// in which to place this item.
+    // This defines any object which is listed in the player's inventory.
+    // It consists of an instance of the object and the inventory tab it belongs to.
+    protected class InventoryBuilder<ObjectClass> extends GenericBuilder {
+        // .. _i:
+        //
+        // An instance of the object which this class builds.
+        ObjectClass i;
+        // .. _tab:
+        //
+        // The `creative-mode tab <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraft/creativetab/CreativeTabs.html>`_
+          // in which to place this item.
         CreativeTabs tab;
-    	
-		ItemBuilder(
-		 // See name_.
-		 String name,
-		 // See tab_.
-	  	 CreativeTabs tab) {
-			
-			super(name);
-    		o = new Item();
-			this.tab = tab;
-		}
-
-    	public void preInit(FMLPreInitializationEvent event) {
-    		preInitItem(o, name, tab);
-    	}
-    	
-    	public void init(FMLInitializationEvent event) {
-            initItem(o, name, event);
-    	}	
+        
+        protected InventoryBuilder(
+          // See name_.
+          String name,
+          // See tab_.
+          CreativeTabs tab) {
+            
+            super(name);
+            this.tab = tab;
+        }
     }
 
+    // This provides standard initialization for Item and Item-derived objects.
+    protected class TemplateItemBuilder<ObjectClass> extends InventoryBuilder<ObjectClass> {
+        protected TemplateItemBuilder(String name, CreativeTabs tab) {
+            super(name, tab);
+        }
+        
+        public void preInit(FMLPreInitializationEvent event) {
+            preInitItem((Item) i, name, tab);
+        }
+        
+        public void init(FMLInitializationEvent event) {
+            initItem((Item) i, name, event);
+        }    
+    }
+    
+
+// External classes
+// ----------------
+// These are intended for mod authors' use.
+    
+    // Build an Item.
+    public class ItemBuilder extends TemplateItemBuilder<Item> {
+        
+        public ItemBuilder(
+          // See name_.
+	      String name,
+	      // See tab_.
+	      CreativeTabs tab) {
+
+            super(name, tab);
+            i = new Item();
+        }
+    }
+    
     
     // Create and define a new `food
     // <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraft/item/ItemFood.html>`_.
     // Refer to `hunger mechanics <http://minecraft.gamepedia.com/Hunger#Mechanics>`_
     // for more information on the meaning of food and saturation below.
-    public class ItemFoodBuilder extends ItemBuilder {
+    public class ItemFoodBuilder extends TemplateItemBuilder<ItemFood> {
 
-	    ItemFoodBuilder(
-		  // See name_.
-		  String name,
-		  // See tab_.
-		  CreativeTabs tab,
-		  // The amount of food points added when this item is eaten,
-		  // each each point = 1/2 heart.
-		  int amount,
-		  // The food saturation level ratio: food saturation increases by
-		  // food*saturation when this food is eaten.
-		  float saturation,
-		  // True if this food is wolf meat.
-		  boolean isWolfMeat) {
-	    		
-			super(name, tab);
-			o = new ItemFood(amount, saturation, isWolfMeat);
-	    }
-	    
-	    // See above for parameter definitions.
-	    ItemFoodBuilder(String name, CreativeTabs tab, int amount, 
-	    		boolean isWolfMeat) {
-			super(name, tab);
-			o = new ItemFood(amount, isWolfMeat);
-	    }
+        public ItemFoodBuilder(
+          // See name_.
+          String name,
+          // See tab_.
+          CreativeTabs tab,
+          // The amount of food points added when this item is eaten,
+          // each each point = 1/2 heart.
+          int amount,
+          // The food saturation level ratio: food saturation increases by
+          // food*saturation when this food is eaten.
+          float saturation,
+          // True if this food is wolf meat.
+          boolean isWolfMeat) {
+                
+            super(name, tab);
+            i = new ItemFood(amount, saturation, isWolfMeat);
+        }
+        
+        // See above for parameter definitions.
+        ItemFoodBuilder(String name, CreativeTabs tab, int amount, 
+                boolean isWolfMeat) {
+        	
+            super(name, tab);
+            i = new ItemFood(amount, isWolfMeat);
+        }
     }
 
     
     // A class to simplify adding a block to a mod.
-    public class BlockBuilder extends GenericBuilder<Block> {
-    	// See tab_.
-    	CreativeTabs tab;
-    	
+    public class BlockBuilder extends InventoryBuilder<Block> {
         // Create and define a new `block <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraft/block/Block.html>`_.
-    	BlockBuilder(
-    	  // See name_.
-    	  String name,
-    	  // See tab_.
-    	  CreativeTabs tab,
-    	  // The material <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraft/block/material/Material.html>`_
-    	  // which composes this block.
-    	  Material material) {
-    		super(name);
-    		o = new BasicBlock(material);
-    		this.tab = tab;
-    	}
-    	
-    	public void preInit(FMLPreInitializationEvent event) {
-    		o.setUnlocalizedName(name);
-    		o.setCreativeTab(tab);
-    		// Parameterize!
-    		o.setLightLevel(1.0f);
-    		GameRegistry.registerBlock(o, name);
-    	}
-    	
-    	public void init(FMLInitializationEvent event) {
-    		initItem(Item.getItemFromBlock(o), name, event);
-    	}
+        BlockBuilder(
+          // See name_.
+          String name,
+          // See tab_.
+          CreativeTabs tab,
+          // The material <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraft/block/material/Material.html>`_
+          // which composes this block.
+          Material material) {
+        	
+            super(name, tab);
+            i = new BasicBlock(material);
+        }
+        
+        public void preInit(FMLPreInitializationEvent event) {
+            i.setUnlocalizedName(name);
+            i.setCreativeTab(tab);
+            // Parameterize!
+            i.setLightLevel(1.0f);
+            GameRegistry.registerBlock(i, name);
+        }
+        
+        public void init(FMLInitializationEvent event) {
+            initItem(Item.getItemFromBlock(i), name, event);
+        }
     }
 }

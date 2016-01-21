@@ -66,7 +66,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 // Provide convenient access to all the `public static <http://en.wikipedia.org/wiki/Static_import>`_ members in these classes.
 //
 // In particular, I use this to help organize the code: I've placed generic portions of the mod into the ``HelperClass`` below, such as a routine to initialize a new item or block. Specific instances, such as *Black Foozo cookie*, are kept in this file.
-import com.bryanandvika.farming.BuilderClass.*;
+import com.bryanandvika.farming.MinecraftObjectBuilder.*;
 import static java.lang.System.out;
 //
 // Core Mod
@@ -119,7 +119,7 @@ public class FarmingMod {
 
 // Instances for elements created by this mod
 // ------------------------------------------
-    protected static BuilderClass builder = new BuilderClass();
+    protected static MinecraftObjectBuilder builder = new MinecraftObjectBuilder();
     public static ItemBuilder acidSlimeItemBuilder = 
     		builder.new ItemBuilder("acid_slime", CreativeTabs.tabMisc); 
 	public static ItemBuilder gemShardItemBuilder = 
@@ -179,13 +179,13 @@ public class FarmingMod {
 
     	builder.preInit(event);
     	
-    	BuilderClass.registerEntity("flame_creeper", instance, EntityFlameCreeper.class);
-    	BuilderClass.registerEntity("eye", instance, EntityEye.class);
-    	BuilderClass.registerEntity("llama", instance, EntityLlama.class);
-    	BuilderClass.registerEntity("flame_orb", instance, EntityFlameOrb.class);
-    	BuilderClass.registerEntity("ents_krope", instance, EntityEntsKrope.class);
-    	BuilderClass.registerEntity("dirt_blaster", instance, EntityDirtBlaster.class);
-    	BuilderClass.registerEntity("coyote", instance, EntityCoyote.class);
+    	MinecraftObjectBuilder.registerEntity("flame_creeper", instance, EntityFlameCreeper.class);
+    	MinecraftObjectBuilder.registerEntity("eye", instance, EntityEye.class);
+    	MinecraftObjectBuilder.registerEntity("llama", instance, EntityLlama.class);
+    	MinecraftObjectBuilder.registerEntity("flame_orb", instance, EntityFlameOrb.class);
+    	MinecraftObjectBuilder.registerEntity("ents_krope", instance, EntityEntsKrope.class);
+    	MinecraftObjectBuilder.registerEntity("dirt_blaster", instance, EntityDirtBlaster.class);
+    	MinecraftObjectBuilder.registerEntity("coyote", instance, EntityCoyote.class);
 
     }
 
@@ -213,28 +213,28 @@ public class FarmingMod {
 
         proxy.registerRenderers();
 
-        tabSauces = new CreativeTabsInit("tab_sauces", smallPlumItemBuilder.o);
+        tabSauces = new CreativeTabsInit("tab_sauces", smallPlumItemBuilder.i);
       
 		// Recipes
 		// -------
         // Acid slime
-        GameRegistry.addShapelessRecipe(new ItemStack(acidSlimeItemBuilder.o), Items.slime_ball,
+        GameRegistry.addShapelessRecipe(new ItemStack(acidSlimeItemBuilder.i), Items.slime_ball,
      		   Items.gold_nugget);
-        GameRegistry.addSmelting(acidSlimeItemBuilder.o, new ItemStack(Items.nether_wart), 0.2f);
+        GameRegistry.addSmelting(acidSlimeItemBuilder.i, new ItemStack(Items.nether_wart), 0.2f);
         MinecraftForge.EVENT_BUS.register(this);
 
         // Black Foozoo Cookie
-        GameRegistry.addRecipe(new ItemStack(blackFoozooCookieItemBuilder.o),
+        GameRegistry.addRecipe(new ItemStack(blackFoozooCookieItemBuilder.i),
         		" o ", "ouo", " o ", 'u', Items.cookie, 'o', Items.apple);
 
         // Gem Shard
         GameRegistry.addRecipe(new ItemStack(Items.diamond),
-        		" xx", "xxx", "xxx", 'x', gemShardItemBuilder.o);
-        GameRegistry.addShapelessRecipe(new ItemStack(gemShardItemBuilder.o, 16), Items.emerald);
+        		" xx", "xxx", "xxx", 'x', gemShardItemBuilder.i);
+        GameRegistry.addShapelessRecipe(new ItemStack(gemShardItemBuilder.i, 16), Items.emerald);
 
         // Sand Worm Can
-        GameRegistry.addRecipe(new ItemStack(sandWormCanBlockBuilder.o), "www", "sss", "sss",
-        		'w', Items.iron_ingot, 's', FarmingMod.sandWormsItemBuilder.o);
+        GameRegistry.addRecipe(new ItemStack(sandWormCanBlockBuilder.i), "www", "sss", "sss",
+        		'w', Items.iron_ingot, 's', FarmingMod.sandWormsItemBuilder.i);
     }
 
     // This EventHandler_ combined with the `FMLPostInitializationEvent <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraftforge/fml/common/event/FMLPostInitializationEvent.html>`_ 
@@ -248,7 +248,7 @@ public class FarmingMod {
     @SubscribeEvent
     public void onEntityDrop(LivingDropsEvent event) {
     	if (event.entityLiving instanceof EntityZombie) {
-    		event.entityLiving.dropItem(FarmingMod.acidSlimeItemBuilder.o, 1);
+    		event.entityLiving.dropItem(FarmingMod.acidSlimeItemBuilder.i, 1);
   	  	}
     }
 
