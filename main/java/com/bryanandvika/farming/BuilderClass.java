@@ -10,6 +10,9 @@
 package com.bryanandvika.farming;
 
 import java.util.Random;
+
+import com.bryanandvika.farming.BuilderClass.GenericBuilder;
+
 import java.util.LinkedList;
 
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -87,10 +90,11 @@ import net.minecraft.world.World;
 //
 // TODO: More details on this.
 //
-// HelperClass
+// BuilderClass
 // ===========
-// A "hollow" (no non-static members) class to encapsulate all the helpers.
-public class HelperClass {
+// Provides a set of classes coupled with a means to construct them at the 
+// appropriate times (at construction, or during preInit, init, or postInit).
+public class BuilderClass {
 	
 	// The Minecraft Block class has a protected constructor. Make it public.
 	public static class BasicBlock extends Block {
@@ -185,11 +189,29 @@ public class HelperClass {
 // Builders
 // ========
     // A list of builders, on which preInit, Init, and postInit will be invoked.
-    public static LinkedList<GenericBuilder<Object>> genericBuilderList = 
+    protected LinkedList<GenericBuilder<Object>> genericBuilderList = 
     		new LinkedList<GenericBuilder<Object>>();
     
+    public void preInit(FMLPreInitializationEvent event) {
+    	for (GenericBuilder<Object> gb : genericBuilderList) {
+    		gb.preInit(event);
+    	}
+    }
+    
+	public void init(FMLInitializationEvent event) {
+    	for (GenericBuilder<Object> gb : genericBuilderList) {
+    		gb.init(event);
+    	}
+	}
+	
+	public void postInit(FMLPostInitializationEvent event) {
+    	for (GenericBuilder<Object> gb : genericBuilderList) {
+    		gb.postInit(event);
+    	}
+	}
+	
     // The generic builder only holds a name and defines empty preInit, init, and postInit methods.
-    public static class GenericBuilder<O> {
+    protected class GenericBuilder<O> {
     	// The object which this class builds.
     	O o;
     	// .. _name::
@@ -217,7 +239,7 @@ public class HelperClass {
     
     
     // Build an item.
-    public static class ItemBuilder extends GenericBuilder<Item> {
+    public class ItemBuilder extends GenericBuilder<Item> {
     	// .. _tab:
     	//
 		// The `creative-mode tab <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraft/creativetab/CreativeTabs.html>`_
@@ -249,7 +271,7 @@ public class HelperClass {
     // <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraft/item/ItemFood.html>`_.
     // Refer to `hunger mechanics <http://minecraft.gamepedia.com/Hunger#Mechanics>`_
     // for more information on the meaning of food and saturation below.
-    public static class ItemFoodBuilder extends ItemBuilder {
+    public class ItemFoodBuilder extends ItemBuilder {
 
 	    ItemFoodBuilder(
 		  // See name_.
@@ -279,7 +301,7 @@ public class HelperClass {
 
     
     // A class to simplify adding a block to a mod.
-    public static class BlockBuilder extends GenericBuilder<Block> {
+    public class BlockBuilder extends GenericBuilder<Block> {
     	// See tab_.
     	CreativeTabs tab;
     	

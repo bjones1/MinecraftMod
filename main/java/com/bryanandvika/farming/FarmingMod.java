@@ -66,7 +66,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 // Provide convenient access to all the `public static <http://en.wikipedia.org/wiki/Static_import>`_ members in these classes.
 //
 // In particular, I use this to help organize the code: I've placed generic portions of the mod into the ``HelperClass`` below, such as a routine to initialize a new item or block. Specific instances, such as *Black Foozo cookie*, are kept in this file.
-import static com.bryanandvika.farming.HelperClass.*;
+import com.bryanandvika.farming.BuilderClass.*;
 import static java.lang.System.out;
 //
 // Core Mod
@@ -119,43 +119,42 @@ public class FarmingMod {
 
 // Instances for elements created by this mod
 // ------------------------------------------
-// Define objects here, then construct it in the preInit or Init method. This
-// is the verbosity of Java -- I'll have to repeat this to construct everything.
+    protected static BuilderClass builder = new BuilderClass();
     public static ItemBuilder acidSlimeItemBuilder = 
-    		new ItemBuilder("acid_slime", CreativeTabs.tabMisc); 
+    		builder.new ItemBuilder("acid_slime", CreativeTabs.tabMisc); 
 	public static ItemBuilder gemShardItemBuilder = 
-			new ItemBuilder("gem_shard", CreativeTabs.tabMaterials);
+			builder.new ItemBuilder("gem_shard", CreativeTabs.tabMaterials);
 	public static ItemBuilder gemsItemBuilder = 
-			new ItemBuilder("gems", CreativeTabs.tabMisc);  
+			builder.new ItemBuilder("gems", CreativeTabs.tabMisc);  
     public static ItemBuilder sandWormsItemBuilder = 
-    		new ItemBuilder("sand_worms", CreativeTabs.tabMaterials);   
+    		builder.new ItemBuilder("sand_worms", CreativeTabs.tabMaterials);   
     
     public static ItemFoodBuilder blackFoozooCookieItemBuilder = 
-    		new ItemFoodBuilder("black_foozoo_cookie", CreativeTabs.tabFood,
+    		builder.new ItemFoodBuilder("black_foozoo_cookie", CreativeTabs.tabFood,
     		3, 0.3f, false);
     public static ItemFoodBuilder peeledCactusFruitItemBuilder = 
-    		new ItemFoodBuilder("peeled_cactus_fruit", CreativeTabs.tabFood,
+    		builder.new ItemFoodBuilder("peeled_cactus_fruit", CreativeTabs.tabFood,
    		    4, 0.3f, false);
     public static ItemFoodBuilder smallPlumItemBuilder = 
-    		new ItemFoodBuilder("small_plum", CreativeTabs.tabFood,
+    		builder.new ItemFoodBuilder("small_plum", CreativeTabs.tabFood,
     		1, 0.3f, false);
     public static ItemFoodBuilder orangePineappleItemBuilder = 
-    		new ItemFoodBuilder("orange_pineapple", CreativeTabs.tabFood,
+    		builder.new ItemFoodBuilder("orange_pineapple", CreativeTabs.tabFood,
      		2, 5.0f, false);
     public static ItemFoodBuilder cheeseItemBuilder = 
-    		new ItemFoodBuilder("cheese", CreativeTabs.tabFood,
+    		builder.new ItemFoodBuilder("cheese", CreativeTabs.tabFood,
     		6, 0.5f, false);
     public static ItemFoodBuilder dressedCheeseItemBuilder = 
-    		new ItemFoodBuilder("dressed_cheese", CreativeTabs.tabFood,
+    		builder.new ItemFoodBuilder("dressed_cheese", CreativeTabs.tabFood,
     		7, 0.6f, false);
     public static ItemFoodBuilder rawTBoneSteakItemBuilder = 
-    		new ItemFoodBuilder("raw_t_bone_steak", CreativeTabs.tabFood,
+    		builder.new ItemFoodBuilder("raw_t_bone_steak", CreativeTabs.tabFood,
     		2, .8f, true);
     public static ItemFoodBuilder smallPufferFishItemBuilder = 
-    		new ItemFoodBuilder("small_puffer_fish", CreativeTabs.tabFood,
+    		builder.new ItemFoodBuilder("small_puffer_fish", CreativeTabs.tabFood,
     		2, .15f, false);
     public static ItemFoodBuilder cactusSauceItemBuilder = 
-    		new ItemFoodBuilder("cactus_sauce", CreativeTabs.tabFood, 1, 0.3f, false);
+    		builder.new ItemFoodBuilder("cactus_sauce", CreativeTabs.tabFood, 1, 0.3f, false);
 
 
     // Copied from http://www.minecraftforge.net/wiki/Custom_Creative_Tabs
@@ -173,22 +172,20 @@ public class FarmingMod {
     public static ItemSwordInit crabClawWand;
 
     public static BlockBuilder sandWormCanBlockBuilder =
-    		new BlockBuilder("sand_worm_can", CreativeTabs.tabDecorations, Material.iron);    
+    		builder.new BlockBuilder("sand_worm_can", CreativeTabs.tabDecorations, Material.iron);    
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
 
-    	for (GenericBuilder<Object> gb : genericBuilderList) {
-    		gb.preInit(event);
-    	}
+    	builder.preInit(event);
     	
-        registerEntity("flame_creeper", instance, EntityFlameCreeper.class);
-        registerEntity("eye", instance, EntityEye.class);
-        registerEntity("llama", instance, EntityLlama.class);
-        registerEntity("flame_orb", instance, EntityFlameOrb.class);
-        registerEntity("ents_krope", instance, EntityEntsKrope.class);
-        registerEntity("dirt_blaster", instance, EntityDirtBlaster.class);
-        registerEntity("coyote", instance, EntityCoyote.class);
+    	BuilderClass.registerEntity("flame_creeper", instance, EntityFlameCreeper.class);
+    	BuilderClass.registerEntity("eye", instance, EntityEye.class);
+    	BuilderClass.registerEntity("llama", instance, EntityLlama.class);
+    	BuilderClass.registerEntity("flame_orb", instance, EntityFlameOrb.class);
+    	BuilderClass.registerEntity("ents_krope", instance, EntityEntsKrope.class);
+    	BuilderClass.registerEntity("dirt_blaster", instance, EntityDirtBlaster.class);
+    	BuilderClass.registerEntity("coyote", instance, EntityCoyote.class);
 
     }
 
@@ -197,9 +194,7 @@ public class FarmingMod {
     // parameter causes Forge to call this function during Forge mod initialization.
     @EventHandler
     public void init(FMLInitializationEvent event) {
-    	for (GenericBuilder<Object> gb : genericBuilderList) {
-    		gb.init(event);
-    	}
+    	builder.init(event);
         
         crabArmorMaterial = EnumHelper.addArmorMaterial("crab_armor", "crab_armor",
         		5, new int[]{1, 2, 1, 1}, 12);
@@ -247,9 +242,7 @@ public class FarmingMod {
     // initialization phase.
     @EventHandler
     public void postInit(FMLPostInitializationEvent event) {
-    	for (GenericBuilder<Object> gb : genericBuilderList) {
-    		gb.postInit(event);
-    	}
+    	builder.postInit(event);
     }
 
     @SubscribeEvent
