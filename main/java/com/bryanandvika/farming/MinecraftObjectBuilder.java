@@ -97,21 +97,7 @@ import net.minecraft.world.World;
 public class MinecraftObjectBuilder {
 // Old code
 // ========
-// This should all be converted into builders.
-    public static class CreativeTabsInit extends CreativeTabs {
-        Item iconItem;
-        CreativeTabsInit(String name, Item iconItem) {
-            super(name);
-            this.iconItem = iconItem;
-        }
-
-        @Override
-        @SideOnly(Side.CLIENT)
-        public Item getTabIconItem() {
-            return iconItem;
-        }
-    }
-
+// This should be converted into builders.
     public static void registerEntity(String name, Object modInstance, Class entityClass)
     {
         int entityID = EntityRegistry.findGlobalUniqueEntityId();
@@ -137,6 +123,7 @@ public class MinecraftObjectBuilder {
         }
     }
 
+    
     // Create a simple class to aid in loading the correct armor texture in.
     // Copied from http://bedrockminer.jimdo.com/modding-tutorials/basic-modding/custom-armor/
     public class BasicItemArmor extends ItemArmor {
@@ -169,6 +156,30 @@ public class MinecraftObjectBuilder {
     }
 
 
+    public static class BasicCreativeTabs extends CreativeTabs {
+    	// .. _iconItem:
+    	//
+        // The item which provides an icon for this tab.
+        Item iconItem;
+        
+        BasicCreativeTabs(
+          // See name_.
+          String name,
+          // See iconItem_.
+          Item iconItem) {
+        	
+            super(name);
+            this.iconItem = iconItem;
+        }
+
+        @Override
+        @SideOnly(Side.CLIENT)
+        public Item getTabIconItem() {
+            return iconItem;
+        }
+    }
+
+    
 // Helper functions
 // ================
 // Item initialization

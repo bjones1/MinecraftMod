@@ -158,7 +158,8 @@ public class FarmingMod {
 
 
     // Copied from http://www.minecraftforge.net/wiki/Custom_Creative_Tabs
-    public static CreativeTabsInit tabSauces;
+    public static BasicCreativeTabs tabSauces =
+    		new BasicCreativeTabs("tab_sauces", smallPlumItemBuilder.i);
 
     // See http://bedrockminer.jimdo.com/modding-tutorials/basic-modding/custom-armor/.
     public static ArmorMaterial crabArmorMaterial = 
@@ -217,7 +218,6 @@ public class FarmingMod {
 
         proxy.registerRenderers();
 
-        tabSauces = new CreativeTabsInit("tab_sauces", smallPlumItemBuilder.i);
       
 		// Recipes
 		// -------
