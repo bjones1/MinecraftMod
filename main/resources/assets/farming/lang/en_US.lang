@@ -27,5 +27,6 @@ entity.llama.name=Llama
 entity.flame_orb.name=Flame Orb
 entity.ents_krope.name=Ents Krope
 entity.coyote.name=Coyote
+entity.dirt_blaster.name=Dirt Blaster
 
 itemGroup.tab_sauces=Sauces

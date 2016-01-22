@@ -8,28 +8,20 @@
 // ==================
 package com.bryanandvika.farming;
 
-import java.util.Random;
-
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
-import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.fml.common.registry.LanguageRegistry;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.model.ModelCreeper;
 import net.minecraft.client.model.ModelQuadruped;
 import net.minecraft.client.model.ModelRenderer;
-import net.minecraft.client.model.ModelSheep1;
 import net.minecraft.client.renderer.entity.RenderCreeper;
-import net.minecraft.client.renderer.entity.RenderEntity;
 import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RenderSheep;
@@ -43,31 +35,22 @@ import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.entity.passive.EntityWolf;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
-import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemArmor.ArmorMaterial;
 import net.minecraft.item.Item.ToolMaterial;
-import net.minecraft.item.ItemSword;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.EnumHelper;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 // Provide convenient access to all the `public static <http://en.wikipedia.org/wiki/Static_import>`_ members in these classes.
 //
 // In particular, I use this to help organize the code: I've placed generic portions of the mod into the ``HelperClass`` below, such as a routine to initialize a new item or block. Specific instances, such as *Black Foozo cookie*, are kept in this file.
 import com.bryanandvika.farming.MinecraftObjectBuilder.*;
-import static java.lang.System.out;
 //
 // Core Mod
 // ========
@@ -113,13 +96,11 @@ public class FarmingMod {
     //
     // The parameters of `SidedProxy <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraftforge/fml/common/SidedProxy.html>`_
     // gives the package name of these proxies.
-    @SidedProxy(clientSide="com.bryanandvika.farming.client.ClientProxy",
-    		serverSide="com.bryanandvika.farming.CommonProxy")
-    public static CommonProxy proxy;
-
+    
 // Instances for elements created by this mod
 // ------------------------------------------
-    protected static MinecraftObjectBuilder builder = new MinecraftObjectBuilder(MODID);
+    protected static MinecraftObjectBuilder builder = 
+    		new MinecraftObjectBuilder(MODID);
     public static ItemBuilder acidSlimeItemBuilder = 
     		builder.new ItemBuilder("acid_slime", CreativeTabs.tabMisc); 
 	public static ItemBuilder gemShardItemBuilder = 
@@ -188,23 +169,31 @@ public class FarmingMod {
     		builder.new ItemSwordBuilder("crab_claw_wand", 
     				CreativeTabs.tabCombat, crabToolMaterial);
 
-
-    
     public static BlockBuilder sandWormCanBlockBuilder =
-    		builder.new BlockBuilder("sand_worm_can", CreativeTabs.tabDecorations, Material.iron);    
+    		builder.new BlockBuilder("sand_worm_can", CreativeTabs.tabDecorations, Material.iron);
+    
+    public static EntityBuilder flameCreeperEntityBuilder =
+    		builder.new EntityBuilder("flame_creeper", EntityFlameCreeper.class, 
+    				RenderFlameCreeper.class, "");
+    public static EntityBuilder flameOrbEntityBuilder =
+    		builder.new EntityBuilder("flame_orb", EntityFlameOrb.class, 
+    				RenderFlameOrb.class, "");
+    public static EntityBuilder entsKropeEntityBuilder =
+    		builder.new EntityBuilder("ents_krope", EntityEntsKrope.class, 
+    				RenderEntsKrope.class, "");
+    public static EntityBuilder dirtBlasterEntityBuilder =
+    		builder.new EntityBuilder("dirt_blaster", EntityDirtBlaster.class, 
+    				RenderDirtBlaster.class, "");
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
 
+    	builder.modInstance = instance;
     	builder.preInit(event);
     	
-    	MinecraftObjectBuilder.registerEntity("flame_creeper", instance, EntityFlameCreeper.class);
-    	MinecraftObjectBuilder.registerEntity("eye", instance, EntityEye.class);
-    	MinecraftObjectBuilder.registerEntity("llama", instance, EntityLlama.class);
-    	MinecraftObjectBuilder.registerEntity("flame_orb", instance, EntityFlameOrb.class);
-    	MinecraftObjectBuilder.registerEntity("ents_krope", instance, EntityEntsKrope.class);
-    	MinecraftObjectBuilder.registerEntity("dirt_blaster", instance, EntityDirtBlaster.class);
-    	MinecraftObjectBuilder.registerEntity("coyote", instance, EntityCoyote.class);
+    	//MinecraftObjectBuilder.registerEntity("eye", instance, EntityEye.class);
+    	//MinecraftObjectBuilder.registerEntity("llama", instance, EntityLlama.class);
+    	//MinecraftObjectBuilder.registerEntity("coyote", instance, EntityCoyote.class);
 
     }
 
@@ -214,13 +203,9 @@ public class FarmingMod {
     @EventHandler
     public void init(FMLInitializationEvent event) {
     	builder.init(event);
-        
-
-        proxy.registerRenderers();
-
       
-		// Recipes
-		// -------
+// Recipes
+// -------
         // Acid slime
         GameRegistry.addShapelessRecipe(new ItemStack(acidSlimeItemBuilder.i), Items.slime_ball,
      		   Items.gold_nugget);
@@ -256,8 +241,8 @@ public class FarmingMod {
   	  	}
     }
 
-    // Entities
-    // ========
+// Entities
+// ========
     // Taken from http://www.minecraftforum.net/forums/mapping-and-modding/mapping-and-modding-tutorials/1571558-1-7-2-forge-add-new-block-item-entity-ai-creative.
     // See http://www.minecraftforge.net/wiki/Mob_Tut_%281.6.2%29 for more details.
     public static class EntityFlameCreeper extends EntityCreeper {

@@ -10,16 +10,12 @@
 package com.bryanandvika.farming;
 
 import java.util.Random;
-
-import com.bryanandvika.farming.MinecraftObjectBuilder.GenericBuilder;
-
+import java.lang.reflect.Constructor;
 import java.util.LinkedList;
-
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLStateEvent;
-import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -27,12 +23,12 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
-import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemFood;
@@ -40,7 +36,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 import net.minecraft.item.Item.ToolMaterial;
 import net.minecraft.item.ItemArmor.ArmorMaterial;
-import net.minecraft.world.World;
 //
 // Concepts
 // ========
@@ -95,23 +90,6 @@ import net.minecraft.world.World;
 // Provides a set of classes coupled with a means to construct them at the 
 // appropriate times (at construction, or during preInit, init, or postInit).
 public class MinecraftObjectBuilder {
-// Old code
-// ========
-// This should be converted into builders.
-    public static void registerEntity(String name, Object modInstance, Class entityClass)
-    {
-        int entityID = EntityRegistry.findGlobalUniqueEntityId();
-        long seed = name.hashCode();
-        Random rand = new Random(seed);
-        int primaryColor = rand.nextInt() * 16777215;
-        int secondaryColor = rand.nextInt() * 16777215;
-
-        EntityRegistry.registerGlobalEntityID(entityClass, name, entityID);
-        EntityRegistry.registerModEntity(entityClass, name, entityID, modInstance, 64, 1, true);
-        EntityList.entityEggs.put(Integer.valueOf(entityID), 
-                new EntityList.EntityEggInfo(entityID, primaryColor, secondaryColor));
-    }
-
 // Helper classes
 // ==============
 // Builders use these classes in the build process. They aren't intended for 
@@ -156,6 +134,7 @@ public class MinecraftObjectBuilder {
     }
 
 
+    // A convenience class to assist in adding a tab.
     public static class BasicCreativeTabs extends CreativeTabs {
     	// .. _iconItem:
     	//
@@ -211,19 +190,37 @@ public class MinecraftObjectBuilder {
         }
     }
     
+    public void registerEntity(String name, Class<Entity> entityClass)
+    {
+        int entityID = EntityRegistry.findGlobalUniqueEntityId();
+        long seed = name.hashCode();
+        Random rand = new Random(seed);
+        int primaryColor = rand.nextInt() * 16777215;
+        int secondaryColor = rand.nextInt() * 16777215;
+
+        EntityRegistry.registerGlobalEntityID(entityClass, name, entityID);
+        EntityRegistry.registerModEntity(entityClass, name, entityID, modInstance, 64, 1, true);
+        EntityList.entityEggs.put(Integer.valueOf(entityID), 
+                new EntityList.EntityEggInfo(entityID, primaryColor, secondaryColor));
+    }
+
     
 // Builder framework
 // =================
-    // .. _modid:
+    // .. _modId:
     //
     // The mod id of the mod using this framework.
     String modid;
+    // .. _modInstance:
+    //
+    // The instance of the mod which is using this framework.
+    Object modInstance;
     
     public MinecraftObjectBuilder(
-      // The mod id of the mod using this framework.
-	  String modid) {
+      // See modId_.
+	  String modId) {
     	
-    	this.modid = modid;
+    	this.modid = modId;
     }
     
     // A list of builders, on which preInit, Init, and postInit will be invoked.
@@ -292,7 +289,7 @@ public class MinecraftObjectBuilder {
         // .. _tab:
         //
         // The `creative-mode tab <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraft/creativetab/CreativeTabs.html>`_
-          // in which to place this item.
+        // in which to place this item.
         CreativeTabs tab;
         
         protected InventoryBuilder(
@@ -328,7 +325,6 @@ public class MinecraftObjectBuilder {
     
     // Build an Item.
     public class ItemBuilder extends TemplateItemBuilder<Item> {
-        
         public ItemBuilder(
           // See name_.
 	      String name,
@@ -346,7 +342,6 @@ public class MinecraftObjectBuilder {
     // Refer to `hunger mechanics <http://minecraft.gamepedia.com/Hunger#Mechanics>`_
     // for more information on the meaning of food and saturation below.
     public class ItemFoodBuilder extends TemplateItemBuilder<ItemFood> {
-
         public ItemFoodBuilder(
           // See name_.
           String name,
@@ -376,8 +371,7 @@ public class MinecraftObjectBuilder {
 
     
     // Build armor.
-    public class ItemArmorBuilder extends TemplateItemBuilder<ItemArmor> {
-        
+    public class ItemArmorBuilder extends TemplateItemBuilder<ItemArmor> {       
     	public ItemArmorBuilder(
           // See name_.
           String name,
@@ -397,7 +391,6 @@ public class MinecraftObjectBuilder {
 
     
     public class ItemSwordBuilder extends TemplateItemBuilder<ItemSword> {
-    	
     	public ItemSwordBuilder(
           // See name_.
           String name,
@@ -413,7 +406,7 @@ public class MinecraftObjectBuilder {
     
     
     // A class to simplify adding a block to a mod.
-    public class BlockBuilder extends InventoryBuilder<Block> {
+    public class BlockBuilder extends InventoryBuilder<Block> {  	
         // Create and define a new `block <file:///C:/Users/bjones/Documents/forge-1.8-11.14.0.1290-1.8-javadoc/net/minecraft/block/Block.html>`_.
         BlockBuilder(
           // See name_.
@@ -438,6 +431,77 @@ public class MinecraftObjectBuilder {
         
         public void init(FMLInitializationEvent event) {
             initItem(Item.getItemFromBlock(i), name, event);
+        }
+    }
+    
+    
+    // A class to build an Entity.
+    public class EntityBuilder extends GenericBuilder {
+    	// .. _entityClass:
+    	//
+        // The class of the entity.
+        Class<Entity> entityClass;
+        // .. _renderClass:
+        //
+        // The class used to render this entity.
+        Class<Render> entityRenderClass;
+        // .. _renderConstructParams:
+        //
+        // Arguments (except the first) needed to construct the 
+        // entityRenderClass.
+        Object[] renderConstructArgs;
+	      
+    	public EntityBuilder(
+	      // See name_.
+	      String name,
+	      // See entityClass_.
+	      Class<?> entityClass,
+	      // See entityRenderClass_.
+	      Class<?> entityRenderClass,
+	      // Arguments to pass for constructing entityRenderClass.
+	      // The first argument must be ""; it will be replaced by
+	      // ``Minecraft.getMinecraft().getRenderManager()``. 
+	      Object... renderConstructArgs) {
+    		
+    		super(name);
+    		this.entityClass = (Class<Entity>) entityClass;
+    		this.entityRenderClass = (Class<Render>) entityRenderClass;
+    		this.renderConstructArgs = renderConstructArgs;
+    	}
+    	
+        public void preInit(FMLPreInitializationEvent event) {
+        	registerEntity(name, entityClass);
+        }
+        
+        @SideOnly(Side.CLIENT)
+        public void init(FMLInitializationEvent event) {
+        	// Now that we're in init, fill in the first argument.
+        	renderConstructArgs[0] = Minecraft.getMinecraft().getRenderManager();
+        	
+        	// Obtain a constructor for ``entityRenderClass`` by determining the
+        	// type of each argument, then asking for that constructor.
+        	Class<?>[] argTypes = new Class[renderConstructArgs.length];
+        	for (int i = 0; i < renderConstructArgs.length; ++i) {
+        		argTypes[i] = renderConstructArgs[i].getClass();
+        	}
+        	Constructor<?> c = null;
+        	try {
+				c = entityRenderClass.getConstructor(argTypes);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+        	
+        	// Now, construct it.
+        	Render r = null;
+			try {
+				r = (Render) c.newInstance(renderConstructArgs);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+			
+			// Finally, register it.
+            RenderingRegistry.registerEntityRenderingHandler(entityClass, 
+                	r);        	
         }
     }
 }

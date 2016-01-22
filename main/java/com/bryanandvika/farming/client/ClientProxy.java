@@ -30,16 +30,8 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void registerRenderers() {
         // See more at: http://www.wuppy29.com/minecraft/1-8-tutorial/updating-1-7-to-1-8-part-2-basic-items/#sthash.Ln5a20tw.wFn11Yz1.dpuf
-        RenderingRegistry.registerEntityRenderingHandler(FarmingMod.EntityFlameCreeper.class, 
-        	new FarmingMod.RenderFlameCreeper(Minecraft.getMinecraft().getRenderManager()));
 //            RenderingRegistry.registerEntityRenderingHandler(FarmingMod.EntityLlama.class, 
 //                    new FarmingMod.RenderLlama(new FarmingMod.ModelLlama(), new ModelSheep2(), 0.5F));
-        RenderingRegistry.registerEntityRenderingHandler(FarmingMod.EntityFlameOrb.class, 
-                new FarmingMod.RenderFlameOrb(Minecraft.getMinecraft().getRenderManager()));
-	    RenderingRegistry.registerEntityRenderingHandler(FarmingMod.EntityEntsKrope.class, 
-	            new FarmingMod.RenderEntsKrope(Minecraft.getMinecraft().getRenderManager()));
-	    RenderingRegistry.registerEntityRenderingHandler(FarmingMod.EntityDirtBlaster.class, 
-	            new FarmingMod.RenderDirtBlaster(Minecraft.getMinecraft().getRenderManager()));
 //            RenderingRegistry.registerEntityRenderingHandler(FarmingMod.EntityCoyote.class, 
 //                    new FarmingMod.RenderCoyote(new ModelWolf(), new ModelWolf(), 0.5F));
         }
